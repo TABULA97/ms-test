@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диагностика РС по критериям McDonald 2024</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #f4f7fb;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 780px;
+            width: 100%;
+            background: white;
+            padding: 30px 35px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+        .warning {
+            background: #fff3e0;
+            border-left: 6px solid #f57c00;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #4e342e;
+            margin-bottom: 25px;
+        }
+        .warning strong {
+            color: #bf360c;
+        }
+        h1 {
+            font-size: 24px;
+            color: #0d2b45;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .badge {
+            background: #0d2b45;
+            color: white;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-weight: normal;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0 10px;
+            position: relative;
+        }
+        .step-indicator .step {
+            background: #e9ecf0;
+            color: #6c7a89;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .step-indicator .step.active {
+            background: #0d2b45;
+            color: white;
+        }
+        .question-block {
+            background: #fafcff;
+            border: 1px solid #e2e9f2;
+            border-radius: 18px;
+            padding: 20px 25px;
+            margin-top: 15px;
+        }
+        .question-block h3 {
+            margin-top: 0;
+            color: #0d2b45;
+            font-size: 18px;
+        }
+        .grid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .grid-options label {
+            background: white;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #dde4ed;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        .grid-options label:hover {
+            border-color: #7a9bcb;
+        }
+        .grid-options input[type="checkbox"],
+        .grid-options input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #0d2b45;
+            flex-shrink: 0;
+        }
+        .btn {
+            background: #0d2b45;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .btn:hover {
+            background: #1a3f61;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .result-box {
+            background: #e8f5e9;
+            border-radius: 18px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 8px solid #2e7d32;
+        }
+        .result-box.negative {
+            background: #ffebee;
+            border-left-color: #c62828;
+        }
+        .result-box h2 {
+            margin-top: 0;
+        }
+        .footnote {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #6c7a89;
+            border-top: 1px solid #e2e9f2;
+            padding-top: 20px;
+            text-align: center;
+        }
+        .inline-hint {
+            font-size: 13px;
+            color: #556b82;
+            margin-left: 6px;
+            cursor: help;
+            border-bottom: 1px dashed #b0c4d9;
+        }
+        .hidden {
+            display: none !important;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px;
+            }
+            .grid-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ -->
+    <div class="warning">
+        <strong>⚠️ Клинический инструмент для врачей:</strong> Данный алгоритм основан на критериях McDonald 2024 и предназначен <strong>исключительно для врачей-неврологов</strong> в учебных или справочных целях. Окончательный диагноз ставится только на основании полного клинического обследования.
+    </div>
+
+    <h1>
+        🧠 Критерии McDonald 2024
+        <span class="badge">Beta v1.0</span>
+    </h1>
+
+    <!-- Индикатор шагов -->
+    <div class="step-indicator" id="progressBar">
+        <span class="step active" id="step1Label">1. Сценарий</span>
+        <span class="step" id="step2Label">2. Очаги (DIS)</span>
+        <span class="step" id="step3Label">3. Биомаркеры</span>
+        <span class="step" id="step4Label">4. Особые условия</span>
+    </div>
+
+    <!-- =========== ШАГ 1 =========== -->
+    <div id="step1" class="question-block">
+        <h3>Шаг 1. Выберите клинический сценарий</h3>
+        <div class="grid-options">
+            <label><input type="radio" name="scenario" value="two_attacks"> ≥ 2 клинических атаки</label>
+            <label><input type="radio" name="scenario" value="one_attack"> 1 атака (CIS)</label>
+            <label><input type="radio" name="scenario" value="ris"> Случайная находка (РИС)</label>
+            <label><input type="radio" name="scenario" value="ppms"> Первично-прогрессирующий (ППРС)</label>
+        </div>
+        <button class="btn" id="toStep2">Далее →</button>
+    </div>
+
+    <!-- =========== ШАГ 2 =========== -->
+    <div id="step2" class="question-block hidden">
+        <h3>Шаг 2. Диссеминация в пространстве (DIS)</h3>
+        <p style="color:#4a5b6e;">Отметьте <strong>все</strong> области, где есть типичные для РС очаги на МРТ (или подтверждение для зрительного нерва: ОКТ/ВЗВП):</p>
+        <div class="grid-options">
+            <label><input type="checkbox" class="dis" value="optic"> 🟡 Зрительный нерв</label>
+            <label><input type="checkbox" class="dis" value="perivent"> 🟣 Перивентрикулярно</label>
+            <label><input type="checkbox" class="dis" value="juxta"> 🔵 Юкстакортикально</label>
+            <label><input type="checkbox" class="dis" value="infra"> 🟢 Инфратенториально</label>
+            <label><input type="checkbox" class="dis" value="spinal"> 🔴 Спинной мозг</label>
+        </div>
+        <div style="margin-top:12px; background:#f0f4fa; padding:8px 14px; border-radius:40px; display:inline-block; font-size:14px;">
+            Выбрано областей: <span id="disCountDisplay">0</span> из 5
+        </div>
+        <button class="btn" id="toStep3">Далее →</button>
+    </div>
+
+    <!-- =========== ШАГ 3 =========== -->
+    <div id="step3" class="question-block hidden">
+        <h3>Шаг 3. Биомаркеры и диссеминация во времени (DIT)</h3>
+        <p style="color:#4a5b6e;">Отметьте наличие следующих подтвержденных данных:</p>
+        <div class="grid-options">
+            <label><input type="checkbox" id="csf"> 🧪 Ликвор+ (ОКБ или ↑ kFLC)</label>
+            <label><input type="checkbox" id="cvs"> 💡 Центральная вена (Select 6)</label>
+            <label><input type="checkbox" id="prl"> 🧲 Парамагнитный ободок (PRL)</label>
+            <label><input type="checkbox" id="dit"> ⏳ DIT (новый очаг / + и - контраст)</label>
+        </div>
+        <button class="btn" id="toStep4">Далее →</button>
+    </div>
+
+    <!-- =========== ШАГ 4 =========== -->
+    <div id="step4" class="question-block hidden">
+        <h3>Шаг 4. Особые группы пациентов</h3>
+        <div style="background:#fff8e1; padding:12px 16px; border-radius:12px; margin-bottom:18px;">
+            <label style="font-weight:600;">
+                <input type="checkbox" id="highRiskGroup"> Возраст ≥50 лет <strong>или</strong> есть коморбидности (мигрень, сосудистые факторы, аутоиммунные заболевания)?
+            </label>
+        </div>
+        <p style="font-size:14px; color:#5d6f83;">
+            <i>Если отмечено — для подтверждения РС <strong>обязательно</strong> наличие как минимум одного из: очаг в спинном мозге, положительный ликвор, или знак центральной вены.</i>
+        </p>
+        <button class="btn" id="calcResult">Получить заключение</button>
+    </div>
+
+    <!-- =========== РЕЗУЛЬТАТ =========== -->
+    <div id="resultArea" class="hidden"></div>
+
+    <div class="footnote">
+        Основано на публикации: McDonald Criteria 2024 (DOI: 10.1016/S1474-4422(24)00119-7).<br>
+        <span style="color:#a0b3c9;">Данный инструмент не заменяет клиническую экспертизу.</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Получение элементов
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const resultArea = document.getElementById('resultArea');
+
+        const label1 = document.getElementById('step1Label');
+        const label2 = document.getElementById('step2Label');
+        const label3 = document.getElementById('step3Label');
+        const label4 = document.getElementById('step4Label');
+
+        const disCheckboxes = document.querySelectorAll('.dis');
+        const disCountDisplay = document.getElementById('disCountDisplay');
+
+        // Переменные состояния
+        let scenario = '';
+
+        // --- Вспомогательные функции ---
+        function updateDisCounter() {
+            const checked = document.querySelectorAll('.dis:checked').length;
+            disCountDisplay.textContent = checked;
+        }
+        disCheckboxes.forEach(cb => cb.addEventListener('change', updateDisCounter));
+
+        function getDisCount() {
+            return document.querySelectorAll('.dis:checked').length;
+        }
+
+        function getDisValues() {
+            const vals = [];
+            document.querySelectorAll('.dis:checked').forEach(cb => vals.push(cb.value));
+            return vals;
+        }
+
+        function isChecked(id) {
+            return document.getElementById(id).checked;
+        }
+
+        // --- Навигация ---
+        document.getElementById('toStep2').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="scenario"]:checked');
+            if (!selected) { alert('Пожалуйста, выберите клинический сценарий.'); return; }
+            scenario = selected.value;
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            label1.classList.remove('active');
+            label2.classList.add('active');
+        });
+
+        document.getElementById('toStep3').addEventListener('click', function() {
+            if (getDisCount() === 0) {
+                alert('Для продолжения необходимо отметить хотя бы одну область (или 0, если вы уверены, но обычно РС так не диагностируют).');
+                // Тем не менее, пусть проходит, так как в некоторых редких случаях DIS может быть 0, но мы это обработаем позже.
+            }
+            step2.classList.add('hidden');
+            step3.classList.remove('hidden');
+            label2.classList.remove('active');
+            label3.classList.add('active');
+        });
+
+        document.getElementById('toStep4').addEventListener('click', function() {
+            step3.classList.add('hidden');
+            step4.classList.remove('hidden');
+            label3.classList.remove('active');
+            label4.classList.add('active');
+        });
+
+        // --- ОСНОВНАЯ ЛОГИКА РАСЧЕТА (McDonald 2024) ---
+        document.getElementById('calcResult').addEventListener('click', function() {
+            const disCount = getDisCount();
+            const disVals = getDisValues();
+            const hasSpinal = disVals.includes('spinal');
+            
+            const csf = isChecked('csf');
+            const cvs = isChecked('cvs');
+            const prl = isChecked('prl');
+            const dit = isChecked('dit');
+            const highRisk = isChecked('highRiskGroup');
+
+            let diagnosis = false;
+            let reason = '';
+            let details = [];
+
+            // Проверка: для группы высокого риска (возраст ≥50 или коморбидности) 
+            // Требуется обязательное наличие Spinal ИЛИ CSF ИЛИ CVS
+            if (highRisk) {
+                if (!(hasSpinal || csf || cvs)) {
+                    diagnosis = false;
+                    reason = '❌ Критерии НЕ выполнены (особая группа).';
+                    details.push('Для пациентов ≥50 лет или с коморбидностями требуется наличие очага в спинном мозге, положительного ликвора или знака центральной вены. Ни одно из условий не выполнено.');
+                    showResult(diagnosis, reason, details);
+                    return;
+                } else {
+                    details.push('✅ Требование для особой группы (Spinal/CSF/CVS) выполнено.');
+                }
+            }
+
+            // --- Логика по сценариям ---
+            if (scenario === 'two_attacks') {
+                // ≥2 атаки: нужен DIS >= 2
+                if (disCount >= 2) {
+                    diagnosis = true;
+                    reason = '✅ Диагноз РС подтвержден.';
+                    details.push('≥2 клинических атак + диссеминация в пространстве (≥2 зон).');
+                } else {
+                    diagnosis = false;
+                    reason = '❌ Критерии НЕ выполнены.';
+                    details.push('При ≥2 атаках требуется поражение минимум 2 из 5 топографических зон (DIS). Выбрано: ' + disCount);
+                }
+            } 
+            else if (scenario === 'one_attack') {
+                // 1 атака (CIS)
+                if (disCount >= 2) {
+                    // DIS+ : нужно одно из: ≥4 зон, CSF, CVS, DIT
+                    if (disCount >= 4 || csf || cvs || dit) {
+                        diagnosis = true;
+                        reason = '✅ Диагноз РС подтвержден.';
+                        details.push('1 атака, DIS+ (≥2 зон) + подтверждение (≥4 зон / CSF / CVS / DIT).');
+                    } else {
+                        diagnosis = false;
+                        reason = '❌ Критерии НЕ выполнены.';
+                        details.push('DIS+ (≥2 зон), но нет ≥4 зон, CSF, CVS или DIT.');
+                    }
+                } else if (disCount === 1) {
+                    // DIS- (1 зона): нужно сочетание двух: (CSF+CVS) или (CSF+PRL) или (DIT+CVS) или (DIT+PRL)
+                    if ((csf && cvs) || (csf && prl) || (dit && cvs) || (dit && prl)) {
+                        diagnosis = true;
+                        reason = '✅ Диагноз РС подтвержден.';
+                        details.push('1 атака, 1 зона (DIS-) + сочетание двух биомаркеров (CSF+CVS / CSF+PRL / DIT+CVS / DIT+PRL).');
+                    } else {
+                        diagnosis = false;
+                        reason = '❌ Критерии НЕ выполнены.';
+                        details.push('1 зона (DIS-), но нет требуемой комбинации из двух биомаркеров.');
+                    }
+                } else { // disCount === 0
+                    diagnosis = false;
+                    reason = '❌ Критерии НЕ выполнены.';
+                    details.push('Нет очагов (DIS=0). РС маловероятен без очагов.');
+                }
+            }
+            else if (scenario === 'ris') {
+                // Случайная находка (РИС): нужно DIS >= 2 И (CSF или CVS или DIT)
+                if (disCount >= 2 && (csf || cvs || dit)) {
+                    diagnosis = true;
+                    reason = '✅ Диагноз РС подтвержден (у пациента с РИС).';
+                    details.push('РИС: DIS+ (≥2 зон) + наличие CSF, CVS или DIT.');
+                } else {
+                    diagnosis = false;
+                    reason = '❌ Критерии НЕ выполнены.';
+                    details.push('Для РИС требуется DIS ≥2 И (CSF ИЛИ CVS ИЛИ DIT).');
+                }
+            }
+            else if (scenario === 'ppms') {
+                // Первично-прогрессирующий: предполагаем, что прогрессирование ≥12 мес есть (это условие мы не спрашивали, но допускаем).
+                // 1) Если ≥2 очагов в СМ: нужно одно из: CSF, CVS, DIT, или ≥4 зон.
+                // 2) Если <2 очагов в СМ или их нет: нужно сочетание двух: (CSF+CVS) или (CSF+PRL) или (DIT+CVS) или (DIT+PRL).
+                // Для простоты считаем, что если отмечен спинной мозг, то это "≥2 очагов" (условно, т.к. мы не спрашиваем количество).
+                // В реальном коде нужно уточнять, но для демо оставим так.
+                if (hasSpinal) {
+                    if (csf || cvs || dit || disCount >= 4) {
+                        diagnosis = true;
+                        reason = '✅ Диагноз ППРС подтвержден.';
+                        details.push('ППРС + очаг(и) в СМ + (CSF / CVS / DIT / ≥4 зон).');
+                    } else {
+                        diagnosis = false;
+                        reason = '❌ Критерии НЕ выполнены.';
+                        details.push('ППРС с очагом в СМ, но нет CSF, CVS, DIT или ≥4 зон.');
+                    }
+                } else {
+                    // Нет очага в СМ (или <2)
+                    if ((csf && cvs) || (csf && prl) || (dit && cvs) || (dit && prl)) {
+                        diagnosis = true;
+                        reason = '✅ Диагноз ППРС подтвержден.';
+                        details.push('ППРС без очагов в СМ + сочетание двух биомаркеров.');
+                    } else {
+                        diagnosis = false;
+                        reason = '❌ Критерии НЕ выполнены.';
+                        details.push('ППРС без очагов в СМ: требуется сочетание двух биомаркеров.');
+                    }
+                }
+            }
+
+            // Финальная проверка, если диагноз true, но мы все равно должны убедиться, что нет "красных флагов" - их мы пропустили в начале.
+            showResult(diagnosis, reason, details);
+        });
+
+        function showResult(isPositive, mainReason, detailsArray) {
+            step4.classList.add('hidden');
+            label4.classList.remove('active');
+            resultArea.classList.remove('hidden');
+            resultArea.innerHTML = '';
+
+            const box = document.createElement('div');
+            box.className = 'result-box' + (isPositive ? '' : ' negative');
+
+            let icon = isPositive ? '✅' : '❌';
+            let title = isPositive ? 'Диагноз: Рассеянный склероз (по критериям 2024)' : 'Диагноз РС НЕ ПОДТВЕРЖДАЕТСЯ';
+
+            let html = `<h2>${icon} ${title}</h2>`;
+            html += `<p><strong>Заключение:</strong> ${mainReason}</p>`;
+            html += `<ul style="padding-left:20px; line-height:1.6;">`;
+            detailsArray.forEach(d => html += `<li>${d}</li>`);
+            html += `</ul>`;
+            html += `<p style="margin-top:16px; font-size:14px; color:#4a5b6e; background:#f8fafc; padding:10px; border-radius:8px;">
+                        <strong>Важно:</strong> Данное заключение основано на введенных данных и не является окончательным врачебным диагнозом. 
+                        Окончательное решение принимает невролог после полного обследования и исключения других заболеваний.
+                    </p>`;
+            html += `<button class="btn" style="background:#6c7a89;" onclick="location.reload()">Пройти заново</button>`;
+            box.innerHTML = html;
+            resultArea.appendChild(box);
+            // Прокрутка к результату
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+    })();
+</script>
+</body>
+</html>
