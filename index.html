@@ -35,6 +35,12 @@
             margin-top: 0;
             text-align: center;
         }
+        .version {
+            font-size: 14px;
+            color: #6b7a8f;
+            text-align: center;
+            margin-bottom: 15px;
+        }
         .step-indicator {
             display: flex;
             justify-content: space-between;
@@ -176,6 +182,9 @@
         .result-box .diagnosis.no {
             color: #b33a3a;
         }
+        .result-box .diagnosis.observation {
+            color: #b38f3a;
+        }
         .result-box .details {
             color: #1f3a5f;
         }
@@ -202,6 +211,7 @@
 <body>
 <div class="container">
     <h1>🧠 Диагностика рассеянного склероза</h1>
+    <div class="version">Версия 2.0 (критерии McDonald 2024)</div>
     <div class="step-indicator">
         <span id="step1-label" class="active">1. Общие данные</span>
         <span id="step2-label">2. Клинические очаги</span>
@@ -227,11 +237,13 @@
             </div>
         </div>
         <div class="question-group">
-            <label>Тип течения</label>
+            <label>Тип течения (клинический фенотип)</label>
             <div class="options">
                 <label><input type="radio" name="course" value="rr" checked> Ремиттирующий (РРС)</label>
                 <label><input type="radio" name="course" value="pp"> Первично-прогрессирующий (ППРС)</label>
+                <label><input type="radio" name="course" value="sp"> Вторично-прогрессирующий (ВПРС)</label>
             </div>
+            <p class="hint">Для ВПРС подразумевается, что у пациента ранее был РРС, а затем наступило прогрессирование.</p>
         </div>
         <div class="question-group" id="pp-group" style="display:none;">
             <label>Прогрессирование неврологических нарушений в течение ≥ 1 года (независимо от обострений)?</label>
@@ -239,6 +251,7 @@
                 <label><input type="radio" name="progression" value="yes"> Да</label>
                 <label><input type="radio" name="progression" value="no" checked> Нет</label>
             </div>
+            <p class="hint">Обязательно для ППРС.</p>
         </div>
         <div class="question-group">
             <label>Количество клинических приступов (атак) за весь период наблюдения</label>
@@ -254,6 +267,7 @@
                 <label><input type="radio" name="new_attack" value="yes"> Да</label>
                 <label><input type="radio" name="new_attack" value="no" checked> Нет</label>
             </div>
+            <p class="hint">При 0 приступов этот вопрос игнорируется. При 1 приступе ответ "Да" означает наличие второго приступа (фактически ≥2).</p>
         </div>
     </div>
 
@@ -388,11 +402,10 @@
 
     updateStepUI();
 
-    // --- Основная логика диагностики (исправленная) ---
+    // --- Основная логика диагностики (обновлённая v2.0) ---
     function runDiagnosis() {
         // Проверка заполнения всех обязательных радио-групп
         const requiredRadios = ['age', 'comorbid', 'course', 'attacks', 'new_attack', 'clinical_dis', 'central_vein', 'rim', 'spinal_count'];
-        // Для ППРС дополнительно проверяем progression
         const course = document.querySelector('input[name="course"]:checked')?.value;
         if (course === 'pp') requiredRadios.push('progression');
         let allFilled = true;
@@ -417,8 +430,18 @@
         if (courseVal === 'pp') {
             progression = document.querySelector('input[name="progression"]:checked').value;
         }
-        const attacks = document.querySelector('input[name="attacks"]:checked').value;
+        let attacks = document.querySelector('input[name="attacks"]:checked').value;
         const newAttack = document.querySelector('input[name="new_attack"]:checked').value;
+
+        // Проверка непротиворечивости ответов
+        if (attacks === '0' && newAttack === 'yes') {
+            alert('❌ Противоречие: при 0 приступов не может быть нового приступа. Пожалуйста, исправьте выбор.');
+            return;
+        }
+        if (attacks === '1' && newAttack === 'yes') {
+            alert('❌ Противоречие: если был новый приступ после первого, то общее количество приступов должно быть ≥2. Пожалуйста, исправьте выбор (выберите "≥2" в количестве приступов).');
+            return;
+        }
 
         const clinicalDis = document.querySelector('input[name="clinical_dis"]:checked').value;
 
@@ -432,8 +455,7 @@
         };
         const countRegions = Object.values(regions).filter(v => v).length;
 
-        // Спинальные очаги: количество (0,1,>=2)
-        const spinalCount = document.querySelector('input[name="spinal_count"]:checked').value; // "0","1","2"
+        const spinalCount = document.querySelector('input[name="spinal_count"]:checked').value;
         const hasSpinalLesions = (spinalCount !== '0');
         const hasTwoOrMoreSpinal = (spinalCount === '2');
 
@@ -453,6 +475,7 @@
 
         let result = '';
         let details = [];
+        let diagnosisType = ''; // 'rr', 'pp', 'sp'
 
         function addDetail(text) { details.push(text); }
 
@@ -461,19 +484,21 @@
         if (countRegions >= 2) {
             DIS_met = true;
         } else if (attacks === '2' && clinicalDis === 'yes') {
-            DIS_met = true; // клиническая диссеминация при ≥2 приступах засчитывается
+            DIS_met = true;
         }
-        const DIS_auto = (countRegions >= 4); // ≥4 областей автоматически даёт DIS
+        const DIS_auto = (countRegions >= 4);
 
         // Проверка возраст/коморбидности: требуется дополнительный фактор
         let extraRequirement = false;
         if (age === 'yes' || comorbid === 'yes') {
-            // Должен быть хотя бы один из: очаг в СМ, CSF, центральная вена
             if (!(hasSpinalLesions || CSF || centralVein)) {
                 extraRequirement = true;
                 addDetail('❗ Для пациентов ≥50 лет или с коморбидностями требуется дополнительное подтверждение: очаг в спинном мозге, положительный CSF или симптом центральной вены.');
             }
         }
+
+        // Флаг, установлен ли диагноз
+        let diagnosisEstablished = false;
 
         // Основная логика по типу течения
         if (courseVal === 'pp') {
@@ -482,23 +507,23 @@
                 result = 'НЕДОСТАТОЧНО ДАННЫХ';
                 addDetail('Для ППРС требуется подтверждённое прогрессирование в течение ≥1 года.');
             } else {
-                // Проверяем наличие ≥2 спинальных очагов
                 if (hasTwoOrMoreSpinal) {
-                    // Если ≥2 спинальных – нужно одно из: CSF, CVS, DIT, или ≥4 областей
                     if (CSF || centralVein || DIT || DIS_auto) {
-                        result = 'ДИАГНОЗ МС (ППРС) УСТАНОВЛЕН';
+                        diagnosisEstablished = true;
+                        diagnosisType = 'pp';
                         addDetail('ППРС: ≥2 очагов в СМ + наличие CSF, центральной вены, DIT или ≥4 областей.');
                     } else {
                         result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
                         addDetail('Есть ≥2 спинальных очагов, но требуется CSF, центральная вена, DIT или ≥4 областей.');
                     }
                 } else {
-                    // 0 или 1 спинальный очаг – нужна комбинация или DIS_auto
                     if (DIS_auto) {
-                        result = 'ДИАГНОЗ МС (ППРС) УСТАНОВЛЕН';
+                        diagnosisEstablished = true;
+                        diagnosisType = 'pp';
                         addDetail('ППРС: ≥4 областей на МРТ (автоматический DIS).');
                     } else if ((CSF && centralVein) || (CSF && rim) || (DIT && centralVein) || (DIT && rim)) {
-                        result = 'ДИАГНОЗ МС (ППРС) УСТАНОВЛЕН';
+                        diagnosisEstablished = true;
+                        diagnosisType = 'pp';
                         addDetail('ППРС: менее 2 спинальных очагов, но есть комбинация (CSF+CVS, CSF+PRL, DIT+CVS, DIT+PRL).');
                     } else {
                         result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
@@ -507,64 +532,102 @@
                 }
             }
         } else {
-            // Ремиттирующий
+            // Ремиттирующий или вторично-прогрессирующий (логика одинаковая)
             if (attacks === '0') {
                 // Радиологически изолированный синдром
                 if (DIS_met || DIS_auto) {
                     if (CSF || centralVein || DIT) {
-                        result = 'ДИАГНОЗ МС УСТАНОВЛЕН (РИС)';
+                        diagnosisEstablished = true;
+                        diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
                         addDetail('РИС: DIS выполнено + CSF, центральная вена или DIT.');
                     } else {
-                        result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                        addDetail('РИС: требуется CSF, центральная вена или DIT.');
+                        result = 'НАБЛЮДЕНИЕ';
+                        addDetail('РИС: DIS выполнено, но нет CSF, центральной вены или DIT. Требуется наблюдение.');
                     }
                 } else {
-                    result = 'НЕДОСТАТОЧНО ДАННЫХ';
+                    result = 'РС МАЛОВЕРОЯТЕН';
                     addDetail('Для РИС требуется DIS (≥2 областей).');
                 }
             } else if (attacks === '1') {
                 // Один приступ
                 if (DIS_auto) {
-                    result = 'ДИАГНОЗ МС УСТАНОВЛЕН';
+                    diagnosisEstablished = true;
+                    diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
                     addDetail('Один приступ + ≥4 областей (автоматический DIS).');
                 } else if (DIS_met && (DIT || CSF)) {
-                    result = 'ДИАГНОЗ МС УСТАНОВЛЕН';
+                    diagnosisEstablished = true;
+                    diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
                     addDetail('Один приступ + DIS + DIT или CSF.');
                 } else if (countRegions === 1) {
                     if ((CSF && centralVein) || (CSF && rim) || (DIT && centralVein) || (DIT && rim)) {
-                        result = 'ДИАГНОЗ МС УСТАНОВЛЕН';
+                        diagnosisEstablished = true;
+                        diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
                         addDetail('Одна область + комбинация (CSF+CVS, CSF+PRL, DIT+CVS или DIT+PRL).');
                     } else {
-                        result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                        addDetail('Для одной области требуется одна из комбинаций: CSF+CVS, CSF+PRL, DIT+CVS или DIT+PRL.');
+                        result = 'НАБЛЮДЕНИЕ';
+                        addDetail('Одна область, но нет требуемой комбинации. Требуется наблюдение.');
                     }
                 } else {
-                    result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                    addDetail('Не выполнены условия для диагноза при одном приступе.');
+                    // Если countRegions === 0 или другие случаи
+                    result = 'НАБЛЮДЕНИЕ';
+                    addDetail('Не выполнены условия для диагноза при одном приступе, но есть некоторые данные. Требуется наблюдение.');
                 }
-            } else { // attacks >=2
+            } else { // attacks === '2'
                 if (DIS_met || DIS_auto) {
-                    result = 'ДИАГНОЗ МС УСТАНОВЛЕН';
+                    diagnosisEstablished = true;
+                    diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
                     addDetail('≥2 приступов + DIS (≥2 областей).');
                 } else {
-                    result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                    addDetail('Для ≥2 приступов требуется DIS (≥2 областей).');
+                    // Нет DIS
+                    if (countRegions > 0 || CSF || centralVein || DIT) {
+                        result = 'НАБЛЮДЕНИЕ';
+                        addDetail('≥2 приступов, но DIS не выполнено. Есть другие признаки – требуется наблюдение.');
+                    } else {
+                        result = 'РС МАЛОВЕРОЯТЕН';
+                        addDetail('Нет диссеминации в пространстве и нет других маркеров.');
+                    }
                 }
             }
         }
 
-        // Если extraRequirement активен и результат был положительным – переопределяем
-        if (extraRequirement && result.includes('УСТАНОВЛЕН')) {
-            result = 'ДИАГНОЗ НЕ ПОДТВЕРЖДЁН (доп. требование)';
-            // Сообщение уже добавлено в details
+        // Если extraRequirement активен и диагноз был установлен – отменяем
+        if (extraRequirement && diagnosisEstablished) {
+            diagnosisEstablished = false;
+            result = 'НАБЛЮДЕНИЕ';
+            addDetail('Из-за возраста/коморбидностей требуется дополнительный фактор, который не подтверждён. Наблюдение.');
+        }
+
+        // Формирование финального результата
+        let finalText = '';
+        if (diagnosisEstablished) {
+            let typeName = '';
+            if (diagnosisType === 'rr') typeName = 'ремиттирующий тип течения';
+            else if (diagnosisType === 'pp') typeName = 'первично-прогрессирующий тип течения';
+            else if (diagnosisType === 'sp') typeName = 'вторично-прогрессирующий тип течения';
+            finalText = 'Рассеянный склероз, ' + typeName;
+            result = finalText; // переопределяем result
+        } else {
+            // Если result ещё не установлен (например, в некоторых ветках), устанавливаем по умолчанию
+            if (!result) {
+                // Проверяем наличие хоть каких-то признаков
+                if (countRegions > 0 || CSF || centralVein || DIT || (attacks === '0' && DIS_met) || (courseVal === 'pp' && progression === 'yes')) {
+                    result = 'НАБЛЮДЕНИЕ';
+                    addDetail('Есть отдельные признаки, но критерии не выполнены. Рекомендовано динамическое наблюдение.');
+                } else {
+                    result = 'РС МАЛОВЕРОЯТЕН';
+                    addDetail('Отсутствуют объективные данные, характерные для МС.');
+                }
+            }
         }
 
         // Вывод результата
         const box = document.getElementById('resultBox');
         box.style.display = 'block';
         let html = '<span class="diagnosis ';
-        if (result.includes('УСТАНОВЛЕН') || result.includes('ДИАГНОЗ МС')) {
+        if (diagnosisEstablished) {
             html += 'yes">✅ ' + result + '</span>';
+        } else if (result.includes('НАБЛЮДЕНИЕ')) {
+            html += 'observation">⏳ ' + result + '</span>';
         } else {
             html += 'no">❌ ' + result + '</span>';
         }
@@ -581,9 +644,10 @@
         html += ', центр.вена: ' + (centralVein ? 'да' : 'нет') + ', rim: ' + (rim ? 'да' : 'нет');
         html += ', спинальных очагов: ' + spinalCount;
         html += ', возраст≥50: ' + (age === 'yes' ? 'да' : 'нет') + ', коморбидности: ' + (comorbid === 'yes' ? 'да' : 'нет');
+        html += ', приступов: ' + attacks + (attacks === '2' ? ' (≥2)' : '');
+        html += ', тип течения: ' + courseVal;
         html += '</p>';
         box.innerHTML = html;
-        // Прокрутка к результату
         box.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
