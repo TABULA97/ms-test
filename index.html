@@ -260,13 +260,13 @@
     <!-- Шаг 2 -->
     <div id="step2" class="step">
         <div class="question-group">
-            <label>Объективные клинические признаки поражения ≥ 2 различных областей ЦНС (например, оптический неврит + пирамидные симптомы)?</label>
+            <label>Имеются ли клинические признаки поражения ≥ 2 различных областей ЦНС (например, оптический неврит + пирамидные симптомы)?</label>
             <div class="options">
                 <label><input type="radio" name="clinical_dis" value="yes"> Да</label>
                 <label><input type="radio" name="clinical_dis" value="no" checked> Нет</label>
             </div>
+            <p class="hint">Этот критерий учитывается <strong>только при ≥2 приступах</strong>. При одном приступе используется только МРТ.</p>
         </div>
-        <p class="hint">Если да, это может заменить МРТ-критерий диссеминации в пространстве.</p>
     </div>
 
     <!-- Шаг 3 -->
@@ -280,6 +280,15 @@
                 <label><input type="checkbox" name="region_infratent"> Инфратенториально</label>
                 <label><input type="checkbox" name="region_spinal"> Спинной мозг</label>
             </div>
+        </div>
+        <div class="question-group">
+            <label>Количество очагов в спинном мозге (если есть):</label>
+            <div class="options">
+                <label><input type="radio" name="spinal_count" value="0" checked> 0</label>
+                <label><input type="radio" name="spinal_count" value="1"> 1</label>
+                <label><input type="radio" name="spinal_count" value="2"> ≥ 2</label>
+            </div>
+            <p class="hint">Важно для первично-прогрессирующего течения.</p>
         </div>
         <div class="question-group">
             <label>Количество очагов с симптомом «центральной вены» (на susceptibility-sequences):</label>
@@ -342,15 +351,12 @@
     const totalSteps = 5;
 
     function updateStepUI() {
-        // Показать только активный шаг
         document.querySelectorAll('.step').forEach((el, idx) => {
             el.classList.toggle('active', idx === currentStep-1);
         });
-        // Обновить индикаторы
         document.querySelectorAll('.step-indicator span').forEach((el, idx) => {
             el.classList.toggle('active', idx === currentStep-1);
         });
-        // Кнопки
         document.getElementById('prevBtn').disabled = (currentStep === 1);
         document.getElementById('nextBtn').textContent = (currentStep === totalSteps) ? 'Завершить' : 'Далее';
         // Показать/скрыть группу ППРС
@@ -366,7 +372,6 @@
         let newStep = currentStep + delta;
         if (newStep < 1) newStep = 1;
         if (newStep > totalSteps) {
-            // Если нажали "Завершить" на последнем шаге, запускаем диагностику
             if (currentStep === totalSteps) {
                 runDiagnosis();
             }
@@ -374,32 +379,48 @@
         }
         currentStep = newStep;
         updateStepUI();
-        // Прокрутить вверх
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Обработчик изменения типа течения
     document.querySelectorAll('input[name="course"]').forEach(el => {
         el.addEventListener('change', updateStepUI);
     });
 
-    // Инициализация
     updateStepUI();
 
-    // --- Логика диагностики ---
+    // --- Основная логика диагностики (исправленная) ---
     function runDiagnosis() {
-        // Сбор данных
-        const age = document.querySelector('input[name="age"]:checked')?.value;
-        const comorbid = document.querySelector('input[name="comorbid"]:checked')?.value;
+        // Проверка заполнения всех обязательных радио-групп
+        const requiredRadios = ['age', 'comorbid', 'course', 'attacks', 'new_attack', 'clinical_dis', 'central_vein', 'rim', 'spinal_count'];
+        // Для ППРС дополнительно проверяем progression
         const course = document.querySelector('input[name="course"]:checked')?.value;
-        let progression = null;
-        if (course === 'pp') {
-            progression = document.querySelector('input[name="progression"]:checked')?.value;
+        if (course === 'pp') requiredRadios.push('progression');
+        let allFilled = true;
+        let missing = [];
+        requiredRadios.forEach(name => {
+            const checked = document.querySelector(`input[name="${name}"]:checked`);
+            if (!checked) {
+                allFilled = false;
+                missing.push(name);
+            }
+        });
+        if (!allFilled) {
+            alert('Пожалуйста, ответьте на все вопросы (особенно: ' + missing.join(', ') + ').');
+            return;
         }
-        const attacks = document.querySelector('input[name="attacks"]:checked')?.value;
-        const newAttack = document.querySelector('input[name="new_attack"]:checked')?.value;
 
-        const clinicalDis = document.querySelector('input[name="clinical_dis"]:checked')?.value;
+        // Сбор данных
+        const age = document.querySelector('input[name="age"]:checked').value;
+        const comorbid = document.querySelector('input[name="comorbid"]:checked').value;
+        const courseVal = course;
+        let progression = null;
+        if (courseVal === 'pp') {
+            progression = document.querySelector('input[name="progression"]:checked').value;
+        }
+        const attacks = document.querySelector('input[name="attacks"]:checked').value;
+        const newAttack = document.querySelector('input[name="new_attack"]:checked').value;
+
+        const clinicalDis = document.querySelector('input[name="clinical_dis"]:checked').value;
 
         // МРТ области
         const regions = {
@@ -411,8 +432,13 @@
         };
         const countRegions = Object.values(regions).filter(v => v).length;
 
-        const centralVein = document.querySelector('input[name="central_vein"]:checked')?.value === 'ge6';
-        const rim = document.querySelector('input[name="rim"]:checked')?.value === 'yes';
+        // Спинальные очаги: количество (0,1,>=2)
+        const spinalCount = document.querySelector('input[name="spinal_count"]:checked').value; // "0","1","2"
+        const hasSpinalLesions = (spinalCount !== '0');
+        const hasTwoOrMoreSpinal = (spinalCount === '2');
+
+        const centralVein = document.querySelector('input[name="central_vein"]:checked').value === 'ge6';
+        const rim = document.querySelector('input[name="rim"]:checked').value === 'yes';
 
         const ditNewLesions = document.querySelector('input[name="dit_new_lesions"]').checked;
         const ditEnhNonenh = document.querySelector('input[name="dit_enh_nonenh"]').checked;
@@ -425,56 +451,58 @@
 
         // --- Алгоритм ---
 
-        // Вспомогательные переменные
-        const DIS_met = (countRegions >= 2) || (clinicalDis === 'yes');
-        const DIS_auto = countRegions >= 4; // ≥4 областей автоматически даёт DIS и даже диагноз при одном приступе
-
         let result = '';
         let details = [];
 
-        // Функция для добавления пояснений
         function addDetail(text) { details.push(text); }
 
-        // Проверка возраста/коморбидностей: требуется дополнительный фактор
+        // Определение DIS: МРТ >=2 областей ИЛИ (клинические признаки >=2 областей И при этом было >=2 приступов)
+        let DIS_met = false;
+        if (countRegions >= 2) {
+            DIS_met = true;
+        } else if (attacks === '2' && clinicalDis === 'yes') {
+            DIS_met = true; // клиническая диссеминация при ≥2 приступах засчитывается
+        }
+        const DIS_auto = (countRegions >= 4); // ≥4 областей автоматически даёт DIS
+
+        // Проверка возраст/коморбидности: требуется дополнительный фактор
         let extraRequirement = false;
         if (age === 'yes' || comorbid === 'yes') {
-            if (!(regions.spinal || CSF || centralVein)) {
-                addDetail('❗ Для пациентов ≥50 лет или с коморбидностями требуется дополнительное подтверждение: очаг в спинном мозге, положительный CSF или симптом центральной вены.');
+            // Должен быть хотя бы один из: очаг в СМ, CSF, центральная вена
+            if (!(hasSpinalLesions || CSF || centralVein)) {
                 extraRequirement = true;
+                addDetail('❗ Для пациентов ≥50 лет или с коморбидностями требуется дополнительное подтверждение: очаг в спинном мозге, положительный CSF или симптом центральной вены.');
             }
         }
 
-        // Основная логика по критериям
-        if (course === 'pp') {
+        // Основная логика по типу течения
+        if (courseVal === 'pp') {
             // Первично-прогрессирующий
             if (progression !== 'yes') {
                 result = 'НЕДОСТАТОЧНО ДАННЫХ';
                 addDetail('Для ППРС требуется подтверждённое прогрессирование в течение ≥1 года.');
             } else {
-                // Если есть ≥2 спинальных очагов (у нас только факт наличия, но мы можем использовать countRegions >=2 как DIS)
-                // По критериям 2024: для ППРС нужна DIS + одно из: CSF, центральная вена, DIT, или ≥4 областей.
-                // Если DIS не выполнено, нужны комбинации.
-                if (DIS_met || DIS_auto) {
+                // Проверяем наличие ≥2 спинальных очагов
+                if (hasTwoOrMoreSpinal) {
+                    // Если ≥2 спинальных – нужно одно из: CSF, CVS, DIT, или ≥4 областей
                     if (CSF || centralVein || DIT || DIS_auto) {
                         result = 'ДИАГНОЗ МС (ППРС) УСТАНОВЛЕН';
-                        addDetail('DIS выполнено (≥2 областей) и есть дополнительный критерий (CSF, центральная вена, DIT или ≥4 областей).');
+                        addDetail('ППРС: ≥2 очагов в СМ + наличие CSF, центральной вены, DIT или ≥4 областей.');
                     } else {
                         result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                        addDetail('DIS выполнено, но требуется CSF, центральная вена, DIT или ≥4 областей.');
+                        addDetail('Есть ≥2 спинальных очагов, но требуется CSF, центральная вена, DIT или ≥4 областей.');
                     }
                 } else {
-                    // Если только одна область
-                    if (countRegions === 1) {
-                        if ((CSF && centralVein) || (CSF && rim) || (DIT && centralVein) || (DIT && rim)) {
-                            result = 'ДИАГНОЗ МС (ППРС) УСТАНОВЛЕН';
-                            addDetail('Одна область + комбинация (CSF+центральная вена, CSF+rim, DIT+центральная вена или DIT+rim).');
-                        } else {
-                            result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                            addDetail('Для одной области требуется одна из комбинаций: CSF+центральная вена, CSF+rim, DIT+центральная вена или DIT+rim.');
-                        }
+                    // 0 или 1 спинальный очаг – нужна комбинация или DIS_auto
+                    if (DIS_auto) {
+                        result = 'ДИАГНОЗ МС (ППРС) УСТАНОВЛЕН';
+                        addDetail('ППРС: ≥4 областей на МРТ (автоматический DIS).');
+                    } else if ((CSF && centralVein) || (CSF && rim) || (DIT && centralVein) || (DIT && rim)) {
+                        result = 'ДИАГНОЗ МС (ППРС) УСТАНОВЛЕН';
+                        addDetail('ППРС: менее 2 спинальных очагов, но есть комбинация (CSF+CVS, CSF+PRL, DIT+CVS, DIT+PRL).');
                     } else {
-                        result = 'НЕДОСТАТОЧНО ОЧАГОВ';
-                        addDetail('Нет очагов в ≥2 областях для DIS.');
+                        result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
+                        addDetail('Для ППРС с <2 спинальными очагами требуется DIS_auto (≥4 областей) или комбинация двух маркеров.');
                     }
                 }
             }
@@ -505,16 +533,16 @@
                 } else if (countRegions === 1) {
                     if ((CSF && centralVein) || (CSF && rim) || (DIT && centralVein) || (DIT && rim)) {
                         result = 'ДИАГНОЗ МС УСТАНОВЛЕН';
-                        addDetail('Одна область + комбинация (CSF+центральная вена, CSF+rim, DIT+центральная вена или DIT+rim).');
+                        addDetail('Одна область + комбинация (CSF+CVS, CSF+PRL, DIT+CVS или DIT+PRL).');
                     } else {
                         result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                        addDetail('Для одной области требуется одна из комбинаций: CSF+центральная вена, CSF+rim, DIT+центральная вена или DIT+rim.');
+                        addDetail('Для одной области требуется одна из комбинаций: CSF+CVS, CSF+PRL, DIT+CVS или DIT+PRL.');
                     }
                 } else {
                     result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
                     addDetail('Не выполнены условия для диагноза при одном приступе.');
                 }
-            } else { // >=2 приступов
+            } else { // attacks >=2
                 if (DIS_met || DIS_auto) {
                     result = 'ДИАГНОЗ МС УСТАНОВЛЕН';
                     addDetail('≥2 приступов + DIS (≥2 областей).');
@@ -525,13 +553,13 @@
             }
         }
 
-        // Если возраст/коморбидности требуют дополнительного фактора и он не выполнен, переопределяем результат
-        if (extraRequirement && result.startsWith('ДИАГНОЗ')) {
+        // Если extraRequirement активен и результат был положительным – переопределяем
+        if (extraRequirement && result.includes('УСТАНОВЛЕН')) {
             result = 'ДИАГНОЗ НЕ ПОДТВЕРЖДЁН (доп. требование)';
             // Сообщение уже добавлено в details
         }
 
-        // Вывод
+        // Вывод результата
         const box = document.getElementById('resultBox');
         box.style.display = 'block';
         let html = '<span class="diagnosis ';
@@ -547,16 +575,18 @@
             details.forEach(d => { html += '<p>• ' + d + '</p>'; });
         }
         html += '</div>';
-        // Добавим сводку введённых данных для проверки
+        // Сводка
         html += '<hr><p style="font-size:14px; color:#3a4a5e;"><strong>Сводка:</strong> ';
         html += 'Областей: ' + countRegions + ', DIS: ' + (DIS_met ? 'да' : 'нет') + ', DIT: ' + (DIT ? 'да' : 'нет') + ', CSF+: ' + (CSF ? 'да' : 'нет');
         html += ', центр.вена: ' + (centralVein ? 'да' : 'нет') + ', rim: ' + (rim ? 'да' : 'нет');
+        html += ', спинальных очагов: ' + spinalCount;
         html += ', возраст≥50: ' + (age === 'yes' ? 'да' : 'нет') + ', коморбидности: ' + (comorbid === 'yes' ? 'да' : 'нет');
         html += '</p>';
         box.innerHTML = html;
+        // Прокрутка к результату
+        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Принудительное обновление UI после переключения
     document.addEventListener('DOMContentLoaded', updateStepUI);
 </script>
 </body>
