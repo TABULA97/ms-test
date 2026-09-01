@@ -211,13 +211,12 @@
 <body>
 <div class="container">
     <h1>🧠 Диагностика рассеянного склероза</h1>
-    <div class="version">Версия 2.0 (критерии McDonald 2024)</div>
+    <div class="version">Версия 3.0 (McDonald 2024, исправленная)</div>
     <div class="step-indicator">
         <span id="step1-label" class="active">1. Общие данные</span>
-        <span id="step2-label">2. Клинические очаги</span>
-        <span id="step3-label">3. МРТ</span>
-        <span id="step4-label">4. CSF</span>
-        <span id="step5-label">5. Результат</span>
+        <span id="step2-label">2. МРТ</span>
+        <span id="step3-label">3. CSF</span>
+        <span id="step4-label">4. Результат</span>
     </div>
 
     <!-- Шаг 1 -->
@@ -260,31 +259,20 @@
                 <label><input type="radio" name="attacks" value="1"> 1</label>
                 <label><input type="radio" name="attacks" value="2" checked> ≥ 2</label>
             </div>
+            <p class="hint">≥2 атак автоматически подтверждают диссеминацию во времени (DIT).</p>
         </div>
-        <div class="question-group">
-            <label>Был ли новый приступ после первого (для диссеминации во времени)?</label>
-            <div class="options">
-                <label><input type="radio" name="new_attack" value="yes"> Да</label>
-                <label><input type="radio" name="new_attack" value="no" checked> Нет</label>
+        <div class="question-group" id="dit-mri-group" style="display:block;">
+            <label>Данные о диссеминации во времени (DIT) по МРТ (если атак <2):</label>
+            <div class="options" style="flex-direction:column; gap:8px;">
+                <label><input type="checkbox" name="dit_new_lesions"> Новые Т2-очаги или очаги, накапливающие контраст, на повторной МРТ</label>
+                <label><input type="checkbox" name="dit_enh_nonenh"> Одновременное наличие усиливающихся и не-усиливающихся очагов на одной МРТ</label>
             </div>
-            <p class="hint">При 0 приступов этот вопрос игнорируется. При 1 приступе ответ "Да" означает наличие второго приступа (фактически ≥2).</p>
+            <p class="hint">Если атак ≥2, DIT считается выполненным автоматически, эти пункты не нужны.</p>
         </div>
     </div>
 
-    <!-- Шаг 2 -->
+    <!-- Шаг 2 (бывший Шаг 3) -->
     <div id="step2" class="step">
-        <div class="question-group">
-            <label>Имеются ли клинические признаки поражения ≥ 2 различных областей ЦНС (например, оптический неврит + пирамидные симптомы)?</label>
-            <div class="options">
-                <label><input type="radio" name="clinical_dis" value="yes"> Да</label>
-                <label><input type="radio" name="clinical_dis" value="no" checked> Нет</label>
-            </div>
-            <p class="hint">Этот критерий учитывается <strong>только при ≥2 приступах</strong>. При одном приступе используется только МРТ.</p>
-        </div>
-    </div>
-
-    <!-- Шаг 3 -->
-    <div id="step3" class="step">
         <div class="question-group">
             <label>Наличие типичных для МС очагов в следующих областях (по данным МРТ головного и спинного мозга):</label>
             <div class="checkbox-group">
@@ -294,6 +282,7 @@
                 <label><input type="checkbox" name="region_infratent"> Инфратенториально</label>
                 <label><input type="checkbox" name="region_spinal"> Спинной мозг</label>
             </div>
+            <p class="hint">DIS считается выполненным, если отмечено ≥2 областей.</p>
         </div>
         <div class="question-group">
             <label>Количество очагов в спинном мозге (если есть):</label>
@@ -318,18 +307,10 @@
                 <label><input type="radio" name="rim" value="no" checked> Нет</label>
             </div>
         </div>
-        <div class="question-group">
-            <label>Данные о диссеминации во времени (DIT):</label>
-            <div class="options" style="flex-direction:column; gap:8px;">
-                <label><input type="checkbox" name="dit_new_lesions"> Новые Т2-очаги или очаги, накапливающие контраст, на повторной МРТ</label>
-                <label><input type="checkbox" name="dit_enh_nonenh"> Одновременное наличие усиливающихся и не-усиливающихся очагов на одной МРТ</label>
-            </div>
-            <p class="hint">Отметьте хотя бы один из пунктов, если DIT подтверждён.</p>
-        </div>
     </div>
 
-    <!-- Шаг 4 -->
-    <div id="step4" class="step">
+    <!-- Шаг 3 (бывший Шаг 4) -->
+    <div id="step3" class="step">
         <div class="question-group">
             <label>Исследование ликвора (CSF):</label>
             <div class="options" style="flex-direction:column; gap:8px;">
@@ -340,8 +321,8 @@
         </div>
     </div>
 
-    <!-- Шаг 5 -->
-    <div id="step5" class="step">
+    <!-- Шаг 4 (бывший Шаг 5) -->
+    <div id="step4" class="step">
         <h3 style="margin-top:0;">Результат диагностики</h3>
         <div id="resultContainer">
             <p>Нажмите «Диагностировать» для получения заключения.</p>
@@ -362,7 +343,7 @@
 <script>
     // --- Управление шагами ---
     let currentStep = 1;
-    const totalSteps = 5;
+    const totalSteps = 4;
 
     function updateStepUI() {
         document.querySelectorAll('.step').forEach((el, idx) => {
@@ -379,6 +360,14 @@
             document.getElementById('pp-group').style.display = 'block';
         } else {
             document.getElementById('pp-group').style.display = 'none';
+        }
+        // Подсказка для DIT: если атак ≥2, скрываем чекбоксы DIT по МРТ (они не нужны)
+        const attacks = document.querySelector('input[name="attacks"]:checked');
+        const ditGroup = document.getElementById('dit-mri-group');
+        if (attacks && attacks.value === '2') {
+            ditGroup.style.display = 'none';
+        } else {
+            ditGroup.style.display = 'block';
         }
     }
 
@@ -399,13 +388,16 @@
     document.querySelectorAll('input[name="course"]').forEach(el => {
         el.addEventListener('change', updateStepUI);
     });
+    document.querySelectorAll('input[name="attacks"]').forEach(el => {
+        el.addEventListener('change', updateStepUI);
+    });
 
     updateStepUI();
 
-    // --- Основная логика диагностики (обновлённая v2.0) ---
+    // --- Основная логика диагностики (исправленная v3.0) ---
     function runDiagnosis() {
         // Проверка заполнения всех обязательных радио-групп
-        const requiredRadios = ['age', 'comorbid', 'course', 'attacks', 'new_attack', 'clinical_dis', 'central_vein', 'rim', 'spinal_count'];
+        const requiredRadios = ['age', 'comorbid', 'course', 'attacks', 'central_vein', 'rim', 'spinal_count'];
         const course = document.querySelector('input[name="course"]:checked')?.value;
         if (course === 'pp') requiredRadios.push('progression');
         let allFilled = true;
@@ -431,19 +423,7 @@
             progression = document.querySelector('input[name="progression"]:checked').value;
         }
         let attacks = document.querySelector('input[name="attacks"]:checked').value;
-        const newAttack = document.querySelector('input[name="new_attack"]:checked').value;
-
-        // Проверка непротиворечивости ответов
-        if (attacks === '0' && newAttack === 'yes') {
-            alert('❌ Противоречие: при 0 приступов не может быть нового приступа. Пожалуйста, исправьте выбор.');
-            return;
-        }
-        if (attacks === '1' && newAttack === 'yes') {
-            alert('❌ Противоречие: если был новый приступ после первого, то общее количество приступов должно быть ≥2. Пожалуйста, исправьте выбор (выберите "≥2" в количестве приступов).');
-            return;
-        }
-
-        const clinicalDis = document.querySelector('input[name="clinical_dis"]:checked').value;
+        // Вопрос о новом приступе убран, так как теперь DIT определяется либо по атакам, либо по МРТ.
 
         // МРТ области
         const regions = {
@@ -462,10 +442,13 @@
         const centralVein = document.querySelector('input[name="central_vein"]:checked').value === 'ge6';
         const rim = document.querySelector('input[name="rim"]:checked').value === 'yes';
 
+        // DIT по МРТ (чекбоксы)
         const ditNewLesions = document.querySelector('input[name="dit_new_lesions"]').checked;
         const ditEnhNonenh = document.querySelector('input[name="dit_enh_nonenh"]').checked;
-        const ditAttack = (newAttack === 'yes');
-        const DIT = ditNewLesions || ditEnhNonenh || ditAttack;
+        const ditMRI = ditNewLesions || ditEnhNonenh;
+
+        // DIT считается выполненным, если ≥2 атак ИЛИ есть МРТ-признаки
+        const DIT = (attacks === '2') || ditMRI;
 
         const csfOcb = document.querySelector('input[name="csf_ocb"]').checked;
         const csfKflc = document.querySelector('input[name="csf_kflc"]').checked;
@@ -479,13 +462,8 @@
 
         function addDetail(text) { details.push(text); }
 
-        // Определение DIS: МРТ >=2 областей ИЛИ (клинические признаки >=2 областей И при этом было >=2 приступов)
-        let DIS_met = false;
-        if (countRegions >= 2) {
-            DIS_met = true;
-        } else if (attacks === '2' && clinicalDis === 'yes') {
-            DIS_met = true;
-        }
+        // DIS определяется ТОЛЬКО по МРТ: ≥2 областей
+        const DIS_met = (countRegions >= 2);
         const DIS_auto = (countRegions >= 4);
 
         // Проверка возраст/коморбидности: требуется дополнительный фактор
@@ -497,7 +475,6 @@
             }
         }
 
-        // Флаг, установлен ли диагноз
         let diagnosisEstablished = false;
 
         // Основная логика по типу течения
@@ -532,17 +509,17 @@
                 }
             }
         } else {
-            // Ремиттирующий или вторично-прогрессирующий (логика одинаковая)
+            // Ремиттирующий или вторично-прогрессирующий
             if (attacks === '0') {
-                // Радиологически изолированный синдром
-                if (DIS_met || DIS_auto) {
+                // РИС
+                if (DIS_met) {
                     if (CSF || centralVein || DIT) {
                         diagnosisEstablished = true;
                         diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
-                        addDetail('РИС: DIS выполнено + CSF, центральная вена или DIT.');
+                        addDetail('РИС: DIS выполнен + CSF, центральная вена или DIT.');
                     } else {
                         result = 'НАБЛЮДЕНИЕ';
-                        addDetail('РИС: DIS выполнено, но нет CSF, центральной вены или DIT. Требуется наблюдение.');
+                        addDetail('РИС: DIS выполнен, но нет CSF, центральной вены или DIT. Требуется наблюдение.');
                     }
                 } else {
                     result = 'РС МАЛОВЕРОЯТЕН';
@@ -568,20 +545,21 @@
                         addDetail('Одна область, но нет требуемой комбинации. Требуется наблюдение.');
                     }
                 } else {
-                    // Если countRegions === 0 или другие случаи
+                    // countRegions === 0
                     result = 'НАБЛЮДЕНИЕ';
-                    addDetail('Не выполнены условия для диагноза при одном приступе, но есть некоторые данные. Требуется наблюдение.');
+                    addDetail('Нет очагов на МРТ, но есть клинический приступ. Требуется наблюдение.');
                 }
             } else { // attacks === '2'
-                if (DIS_met || DIS_auto) {
+                // ≥2 атак: DIT считается выполненным автоматически
+                if (DIS_met) {
                     diagnosisEstablished = true;
                     diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
-                    addDetail('≥2 приступов + DIS (≥2 областей).');
+                    addDetail('≥2 приступов + DIS (≥2 областей на МРТ).');
                 } else {
-                    // Нет DIS
+                    // DIS не выполнен
                     if (countRegions > 0 || CSF || centralVein || DIT) {
                         result = 'НАБЛЮДЕНИЕ';
-                        addDetail('≥2 приступов, но DIS не выполнено. Есть другие признаки – требуется наблюдение.');
+                        addDetail('≥2 приступов, но DIS не выполнен. Есть другие признаки – требуется наблюдение.');
                     } else {
                         result = 'РС МАЛОВЕРОЯТЕН';
                         addDetail('Нет диссеминации в пространстве и нет других маркеров.');
@@ -605,12 +583,11 @@
             else if (diagnosisType === 'pp') typeName = 'первично-прогрессирующий тип течения';
             else if (diagnosisType === 'sp') typeName = 'вторично-прогрессирующий тип течения';
             finalText = 'Рассеянный склероз, ' + typeName;
-            result = finalText; // переопределяем result
+            result = finalText;
         } else {
-            // Если result ещё не установлен (например, в некоторых ветках), устанавливаем по умолчанию
             if (!result) {
-                // Проверяем наличие хоть каких-то признаков
-                if (countRegions > 0 || CSF || centralVein || DIT || (attacks === '0' && DIS_met) || (courseVal === 'pp' && progression === 'yes')) {
+                // Если результат ещё не определён, проверяем наличие хоть каких-то признаков
+                if (countRegions > 0 || CSF || centralVein || DIT || (courseVal === 'pp' && progression === 'yes')) {
                     result = 'НАБЛЮДЕНИЕ';
                     addDetail('Есть отдельные признаки, но критерии не выполнены. Рекомендовано динамическое наблюдение.');
                 } else {
