@@ -1,327 +1,347 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Диагностика РС по критериям Макдональда 2024</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: #f4f7fc;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            padding: 30px 35px;
-            position: relative;
-        }
-        h1 {
-            font-size: 24px;
-            color: #1a2b4c;
-            border-bottom: 2px solid #e6edf5;
-            padding-bottom: 15px;
-            margin-top: 0;
-            text-align: center;
-        }
-        .version {
-            font-size: 14px;
-            color: #6b7a8f;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .step-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            font-size: 14px;
-            color: #6b7a8f;
-        }
-        .step-indicator span {
-            background: #e6edf5;
-            padding: 5px 12px;
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-        .step-indicator span.active {
-            background: #1a2b4c;
-            color: white;
-        }
-        .step {
-            display: none;
-            animation: fade 0.3s ease;
-        }
-        .step.active {
-            display: block;
-        }
-        @keyframes fade {
-            from { opacity: 0.4; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .question-group {
-            margin-bottom: 20px;
-        }
-        .question-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #1f3a5f;
-        }
-        .question-group .hint {
-            font-size: 13px;
-            color: #5e6f86;
-            margin-bottom: 8px;
-            font-weight: normal;
-        }
-        .options {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .options label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 400;
-            cursor: pointer;
-            background: #f8faff;
-            padding: 6px 14px;
-            border-radius: 30px;
-            border: 1px solid #dce3ed;
-            transition: 0.2s;
-        }
-        .options label:hover {
-            background: #eef4fb;
-        }
-        .options input[type="radio"], .options input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #1a2b4c;
-        }
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 400;
-            cursor: pointer;
-            background: #f8faff;
-            padding: 5px 12px;
-            border-radius: 30px;
-            border: 1px solid #dce3ed;
-        }
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            border-top: 1px solid #e6edf5;
-            padding-top: 25px;
-        }
-        .nav-buttons button {
-            background: #1a2b4c;
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 30px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 500;
-        }
-        .nav-buttons button:hover:not(:disabled) {
-            background: #0f1d33;
-        }
-        .nav-buttons button:disabled {
-            background: #b0c0d0;
-            cursor: default;
-        }
-        .nav-buttons button.secondary {
-            background: #e6edf5;
-            color: #1a2b4c;
-        }
-        .nav-buttons button.secondary:hover:not(:disabled) {
-            background: #d0dae8;
-        }
-        .result-box {
-            background: #ebf5ff;
-            border-left: 6px solid #1a2b4c;
-            padding: 20px 25px;
-            border-radius: 10px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .result-box strong {
-            color: #0a1e3a;
-        }
-        .result-box .diagnosis {
-            font-size: 22px;
-            font-weight: 700;
-            display: block;
-            margin-bottom: 10px;
-        }
-        .result-box .diagnosis.yes {
-            color: #0a7e3c;
-        }
-        .result-box .diagnosis.no {
-            color: #b33a3a;
-        }
-        .result-box .diagnosis.observation {
-            color: #b38f3a;
-        }
-        .result-box .details {
-            color: #1f3a5f;
-        }
-        .warning {
-            color: #b33a3a;
-            font-weight: 600;
-        }
-        footer {
-            margin-top: 30px;
-            font-size: 13px;
-            color: #8a9aa8;
-            text-align: center;
-            border-top: 1px solid #e6edf5;
-            padding-top: 20px;
-        }
-        @media (max-width: 600px) {
-            .container { padding: 20px; }
-            .options { gap: 10px; }
-            .options label { padding: 5px 12px; }
-            .nav-buttons button { padding: 8px 20px; font-size: 14px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Диагностика РС по критериям Макдональда 2024</title>
+<style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+        background: #f4f7fc;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+    }
+    .container {
+        max-width: 880px;
+        width: 100%;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        padding: 30px 35px;
+    }
+    h1 {
+        font-size: 24px;
+        color: #1a2b4c;
+        border-bottom: 2px solid #e6edf5;
+        padding-bottom: 15px;
+        margin-top: 0;
+        text-align: center;
+    }
+    .version {
+        font-size: 14px;
+        color: #6b7a8f;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        font-size: 13px;
+        color: #6b7a8f;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .step-indicator span {
+        background: #e6edf5;
+        padding: 5px 12px;
+        border-radius: 20px;
+        transition: 0.3s;
+    }
+    .step-indicator span.active {
+        background: #1a2b4c;
+        color: white;
+    }
+    .step { display: none; animation: fade 0.3s ease; }
+    .step.active { display: block; }
+    @keyframes fade {
+        from { opacity: 0.4; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .question-group { margin-bottom: 20px; }
+    .question-group > label.title {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #1f3a5f;
+    }
+    .question-group .hint {
+        font-size: 13px;
+        color: #5e6f86;
+        margin: 4px 0 8px;
+        font-weight: normal;
+        line-height: 1.5;
+    }
+    .options { display: flex; gap: 16px; flex-wrap: wrap; }
+    .options label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 400;
+        cursor: pointer;
+        background: #f8faff;
+        padding: 6px 14px;
+        border-radius: 30px;
+        border: 1px solid #dce3ed;
+        transition: 0.2s;
+    }
+    .options label:hover { background: #eef4fb; }
+    .options input[type="radio"], .options input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #1a2b4c;
+    }
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .checkbox-group.vertical {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .checkbox-group label {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-weight: 400;
+        cursor: pointer;
+        background: #f8faff;
+        padding: 6px 12px;
+        border-radius: 12px;
+        border: 1px solid #dce3ed;
+        line-height: 1.4;
+        font-size: 14px;
+    }
+    .checkbox-group label:hover { background: #eef4fb; }
+    .number-input {
+        width: 90px;
+        padding: 6px 10px;
+        border: 1px solid #dce3ed;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+    .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        border-top: 1px solid #e6edf5;
+        padding-top: 25px;
+    }
+    .nav-buttons button {
+        background: #1a2b4c;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-weight: 500;
+    }
+    .nav-buttons button:hover:not(:disabled) { background: #0f1d33; }
+    .nav-buttons button:disabled { background: #b0c0d0; cursor: default; }
+    .nav-buttons button.secondary { background: #e6edf5; color: #1a2b4c; }
+    .nav-buttons button.secondary:hover:not(:disabled) { background: #d0dae8; }
+    .result-box {
+        background: #ebf5ff;
+        border-left: 6px solid #1a2b4c;
+        padding: 20px 25px;
+        border-radius: 10px;
+        margin-top: 20px;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    .result-box .diagnosis {
+        font-size: 22px;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 12px;
+    }
+    .result-box .diagnosis.yes { color: #0a7e3c; }
+    .result-box .diagnosis.no { color: #b33a3a; }
+    .result-box .diagnosis.observation { color: #b38f3a; }
+    .result-box .details p { margin: 6px 0; color: #1f3a5f; }
+    .result-box .warning { color: #b33a3a; font-weight: 600; }
+    .summary {
+        background: #f8faff;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #3a4a5e;
+        margin-top: 16px;
+        line-height: 1.7;
+    }
+    footer {
+        margin-top: 30px;
+        font-size: 13px;
+        color: #8a9aa8;
+        text-align: center;
+        border-top: 1px solid #e6edf5;
+        padding-top: 20px;
+    }
+    @media (max-width: 600px) {
+        .container { padding: 20px; }
+        .options { gap: 10px; }
+        .options label { padding: 5px 12px; font-size: 14px; }
+        .nav-buttons button { padding: 8px 20px; font-size: 14px; }
+    }
+</style>
 </head>
 <body>
 <div class="container">
     <h1>🧠 Диагностика рассеянного склероза</h1>
-    <div class="version">Версия 3.0 (McDonald 2024, исправленная)</div>
+    <div class="version">Критерии Макдональда 2024 (для взрослых)</div>
     <div class="step-indicator">
         <span id="step1-label" class="active">1. Общие данные</span>
-        <span id="step2-label">2. МРТ</span>
-        <span id="step3-label">3. CSF</span>
+        <span id="step2-label">2. МРТ / визуальные пути</span>
+        <span id="step3-label">3. Ликвор</span>
         <span id="step4-label">4. Результат</span>
     </div>
 
-    <!-- Шаг 1 -->
+    <!-- ШАГ 1 -->
     <div id="step1" class="step active">
         <div class="question-group">
-            <label>Возраст пациента ≥ 50 лет?</label>
+            <label class="title">Возраст</label>
             <div class="options">
-                <label><input type="radio" name="age" value="yes"> Да</label>
-                <label><input type="radio" name="age" value="no" checked> Нет</label>
+                <label><input type="radio" name="age" value="lt18"> &lt; 18 лет</label>
+                <label><input type="radio" name="age" value="18-49" checked> 18–49 лет</label>
+                <label><input type="radio" name="age" value="ge50"> ≥ 50 лет</label>
             </div>
+            <p class="hint">При возрасте ≥ 50 лет требуются дополнительные подтверждающие признаки (см. шаг 2 и результат).</p>
         </div>
+
         <div class="question-group">
-            <label>Наличие коморбидностей (сосудистые заболевания, мигрень, аутоиммунные, психические расстройства)?</label>
-            <div class="options">
-                <label><input type="radio" name="comorbid" value="yes"> Да</label>
-                <label><input type="radio" name="comorbid" value="no" checked> Нет</label>
+            <label class="title">Коморбидности / факторы риска ошибочного диагноза</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" name="comorbid" value="vascular"> Сосудистые (АГ, СД, курение, дислипидемия)</label>
+                <label><input type="checkbox" name="comorbid" value="migraine"> Головные боли / мигрень</label>
+                <label><input type="checkbox" name="comorbid" value="psychiatric"> Психические расстройства</label>
+                <label><input type="checkbox" name="comorbid" value="autoimmune"> Аутоиммунные заболевания</label>
+                <label><input type="checkbox" name="comorbid_none" id="comorbid_none" checked> Нет</label>
             </div>
+            <p class="hint">При наличии этих факторов требуются дополнительные подтверждающие признаки (спинальный очаг, CSF+, CVS+).</p>
         </div>
+
         <div class="question-group">
-            <label>Тип течения (клинический фенотип)</label>
+            <label class="title">Клинический фенотип (тип течения)</label>
             <div class="options">
                 <label><input type="radio" name="course" value="rr" checked> Ремиттирующий (РРС)</label>
-                <label><input type="radio" name="course" value="pp"> Первично-прогрессирующий (ППРС)</label>
                 <label><input type="radio" name="course" value="sp"> Вторично-прогрессирующий (ВПРС)</label>
+                <label><input type="radio" name="course" value="pp"> Первично-прогрессирующий (ППРС)</label>
             </div>
-            <p class="hint">Для ВПРС подразумевается, что у пациента ранее был РРС, а затем наступило прогрессирование.</p>
+            <p class="hint">Для диагностики ВПРС и РРС используется единый алгоритм; ППРС имеет дополнительные требования.</p>
         </div>
+
         <div class="question-group" id="pp-group" style="display:none;">
-            <label>Прогрессирование неврологических нарушений в течение ≥ 1 года (независимо от обострений)?</label>
+            <label class="title">Прогрессирование неврологического дефицита ≥ 12 месяцев (независимо от обострений)?</label>
             <div class="options">
                 <label><input type="radio" name="progression" value="yes"> Да</label>
                 <label><input type="radio" name="progression" value="no" checked> Нет</label>
             </div>
-            <p class="hint">Обязательно для ППРС.</p>
+            <p class="hint">Обязательно для ППРС (Panel 6, 2024).</p>
         </div>
+
         <div class="question-group">
-            <label>Количество клинических приступов (атак) за весь период наблюдения</label>
+            <label class="title">Клинические атаки (обострения) за весь период наблюдения</label>
             <div class="options">
-                <label><input type="radio" name="attacks" value="0"> 0</label>
-                <label><input type="radio" name="attacks" value="1"> 1</label>
+                <label><input type="radio" name="attacks" value="0"> 0 (РИС — случайная находка)</label>
+                <label><input type="radio" name="attacks" value="1"> 1 (КИС)</label>
                 <label><input type="radio" name="attacks" value="2" checked> ≥ 2</label>
             </div>
-            <p class="hint">≥2 атак автоматически подтверждают диссеминацию во времени (DIT).</p>
+            <p class="hint">≥ 2 атак автоматически подтверждают DIT (клинически).</p>
         </div>
-        <div class="question-group" id="dit-mri-group" style="display:block;">
-            <label>Данные о диссеминации во времени (DIT) по МРТ (если атак <2):</label>
-            <div class="options" style="flex-direction:column; gap:8px;">
-                <label><input type="checkbox" name="dit_new_lesions"> Новые Т2-очаги или очаги, накапливающие контраст, на повторной МРТ</label>
-                <label><input type="checkbox" name="dit_enh_nonenh"> Одновременное наличие усиливающихся и не-усиливающихся очагов на одной МРТ</label>
+
+        <div class="question-group" id="dit-mri-group">
+            <label class="title">DIT по МРТ (при &lt; 2 атаках)</label>
+            <div class="checkbox-group vertical">
+                <label><input type="checkbox" name="dit_new_lesions"> Новые или увеличившиеся Т2-очаги на повторной МРТ</label>
+                <label><input type="checkbox" name="dit_enh_nonenh"> Одновременные Gd-усиливающиеся и Gd-неусиливающиеся очаги на одной МРТ</label>
             </div>
-            <p class="hint">Если атак ≥2, DIT считается выполненным автоматически, эти пункты не нужны.</p>
+            <p class="hint">DIT больше не обязателен для диагноза РС в 2024 г., но используется для повышения специфичности в отдельных ситуациях.</p>
         </div>
     </div>
 
-    <!-- Шаг 2 (бывший Шаг 3) -->
+    <!-- ШАГ 2 -->
     <div id="step2" class="step">
         <div class="question-group">
-            <label>Наличие типичных для МС очагов в следующих областях (по данным МРТ головного и спинного мозга):</label>
+            <label class="title">Типичные очаги в 5 топографических регионах ЦНС</label>
+            <p class="hint">Отметьте регионы, в которых выявлены типичные для РС очаги (симптомные или асимптомные). DIS выполнен при ≥ 2 из 5 регионов; ≥ 4 регионов достаточно для диагноза без доп. критериев.</p>
             <div class="checkbox-group">
-                <label><input type="checkbox" name="region_optic"> Зрительный нерв</label>
-                <label><input type="checkbox" name="region_perivent"> Перивентрикулярно</label>
-                <label><input type="checkbox" name="region_juxta"> Юкстакортикально/кортикально</label>
-                <label><input type="checkbox" name="region_infratent"> Инфратенториально</label>
-                <label><input type="checkbox" name="region_spinal"> Спинной мозг</label>
+                <label><input type="checkbox" id="region_optic"> Зрительный нерв</label>
+                <label><input type="checkbox" id="region_perivent"> Перивентрикулярно</label>
+                <label><input type="checkbox" id="region_juxta"> Юкстакортикально / интракортикально</label>
+                <label><input type="checkbox" id="region_infratent"> Инфратенториально</label>
+                <label><input type="checkbox" id="region_spinal"> Спинной мозг</label>
             </div>
-            <p class="hint">DIS считается выполненным, если отмечено ≥2 областей.</p>
         </div>
+
         <div class="question-group">
-            <label>Количество очагов в спинном мозге (если есть):</label>
+            <label class="title">Если отмечен зрительный нерв — как подтверждён?</label>
+            <p class="hint">Достаточно любого из методов при отсутствии лучшего объяснения (Panel 3, 2024).</p>
+            <div class="checkbox-group vertical">
+                <label><input type="checkbox" id="optic_mri"> МРТ: интринсик-очаг(и) зрительного нерва T2-гиперинтенсивный, без признаков оптического периневрита / хиазмального поражения / longitudinally extensive процесса</label>
+                <label><input type="checkbox" id="optic_oct"> ОКТ: межглазная разница pRNFL ≥ 6 мкм ИЛИ GCIPL ≥ 4 мкм</label>
+                <label><input type="checkbox" id="optic_vep"> ЗВП: удлинение абсолютной P100 или межокулярная асимметрия ≥ 2,5 SD (по локальным нормативам центра)</label>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <label class="title">Спинной мозг: количество типичных очагов</label>
             <div class="options">
                 <label><input type="radio" name="spinal_count" value="0" checked> 0</label>
                 <label><input type="radio" name="spinal_count" value="1"> 1</label>
                 <label><input type="radio" name="spinal_count" value="2"> ≥ 2</label>
             </div>
-            <p class="hint">Важно для первично-прогрессирующего течения.</p>
+            <p class="hint">Для ППРС ≥ 2 спинальных очага сами по себе fulfilment DIS (Panel 4).</p>
         </div>
+
         <div class="question-group">
-            <label>Количество очагов с симптомом «центральной вены» (на susceptibility-sequences):</label>
-            <div class="options">
-                <label><input type="radio" name="central_vein" value="ge6"> ≥ 6</label>
-                <label><input type="radio" name="central_vein" value="lt6" checked> &lt; 6</label>
-            </div>
+            <label class="title">Общее число Т2-очагов в белом веществе (для оценки CVS Select 6)</label>
+            <input type="number" id="totalLesions" class="number-input" min="0" max="200" value="0">
+            <p class="hint">Введите 0, если подсчёт не проводился.</p>
         </div>
+
         <div class="question-group">
-            <label>Наличие парамагнитных rim-очагов (≥ 1):</label>
+            <label class="title">Число очагов с симптомом «центральной вены» (CVS+)</label>
+            <input type="number" id="cvsCount" class="number-input" min="0" max="200" value="0">
+            <p class="hint">
+                Select 6 положителен, если:<br>
+                • ≥ 6 очагов CVS+ при общем числе очагов ≥ 10, ИЛИ<br>
+                • CVS+ очаги составляют большинство при общем числе очагов &lt; 10.
+            </p>
+        </div>
+
+        <div class="question-group">
+            <label class="title">Парамагнитные rim-очаги (PRL) ≥ 1?</label>
             <div class="options">
-                <label><input type="radio" name="rim" value="yes"> Да</label>
-                <label><input type="radio" name="rim" value="no" checked> Нет</label>
+                <label><input type="radio" name="prl" value="yes"> Да</label>
+                <label><input type="radio" name="prl" value="no" checked> Нет</label>
             </div>
         </div>
     </div>
 
-    <!-- Шаг 3 (бывший Шаг 4) -->
+    <!-- ШАГ 3 -->
     <div id="step3" class="step">
         <div class="question-group">
-            <label>Исследование ликвора (CSF):</label>
-            <div class="options" style="flex-direction:column; gap:8px;">
-                <label><input type="checkbox" name="csf_ocb"> Олигоклональные IgG-полосы (CSF-специфичные)</label>
-                <label><input type="checkbox" name="csf_kflc"> Повышенный индекс каппа-свободных лёгких цепей (kFLC)</label>
+            <label class="title">Ликвор (CSF)</label>
+            <div class="checkbox-group vertical">
+                <label><input type="checkbox" name="csf_ocb"> Олигоклональные IgG-полосы, CSF-специфичные (паттерн 2 или 3)</label>
+                <label><input type="checkbox" name="csf_kflc"> Индекс kFLC &gt; 6,1</label>
             </div>
-            <p class="hint">Положительным считается наличие хотя бы одного из этих признаков.</p>
+            <p class="hint">Положительным считается наличие хотя бы одного из признаков (OCB и kFLC-индекс взаимозаменяемы).</p>
+        </div>
+
+        <div class="question-group">
+            <label class="title">Исключение альтернативных диагнозов</label>
+            <div class="checkbox-group vertical">
+                <label><input type="checkbox" name="exclusion_ok"> Исключены альтернативные диагнозы (NMOSD, MOGAD, сосудистые, инфекционные, опухоли, дефицит B12, лейкодистрофии и др.)</label>
+            </div>
+            <p class="hint">Для диагноза РС необходимо отсутствие лучшего объяснения («no better explanation»).</p>
         </div>
     </div>
 
-    <!-- Шаг 4 (бывший Шаг 5) -->
+    <!-- ШАГ 4 -->
     <div id="step4" class="step">
         <h3 style="margin-top:0;">Результат диагностики</h3>
         <div id="resultContainer">
@@ -331,304 +351,322 @@
         <div id="resultBox" class="result-box" style="display:none;"></div>
     </div>
 
-    <!-- Навигация -->
     <div class="nav-buttons">
         <button id="prevBtn" class="secondary" onclick="changeStep(-1)" disabled>Назад</button>
         <button id="nextBtn" onclick="changeStep(1)">Далее</button>
     </div>
 
-    <footer>Инструмент основан на критериях Макдональда 2024 (адаптация 2025). Для клинического использования требуется подтверждение врачом.</footer>
+    <footer>Инструмент основан на критериях Макдональда 2024. Для клинического использования требуется подтверждение врачом.</footer>
 </div>
 
 <script>
-    // --- Управление шагами ---
-    let currentStep = 1;
-    const totalSteps = 4;
+/* ===================== Навигация по шагам ===================== */
+let currentStep = 1;
+const totalSteps = 4;
 
-    function updateStepUI() {
-        document.querySelectorAll('.step').forEach((el, idx) => {
-            el.classList.toggle('active', idx === currentStep-1);
-        });
-        document.querySelectorAll('.step-indicator span').forEach((el, idx) => {
-            el.classList.toggle('active', idx === currentStep-1);
-        });
-        document.getElementById('prevBtn').disabled = (currentStep === 1);
-        document.getElementById('nextBtn').textContent = (currentStep === totalSteps) ? 'Завершить' : 'Далее';
-        // Показать/скрыть группу ППРС
-        const course = document.querySelector('input[name="course"]:checked');
-        if (course && course.value === 'pp') {
-            document.getElementById('pp-group').style.display = 'block';
-        } else {
-            document.getElementById('pp-group').style.display = 'none';
-        }
-        // Подсказка для DIT: если атак ≥2, скрываем чекбоксы DIT по МРТ (они не нужны)
-        const attacks = document.querySelector('input[name="attacks"]:checked');
-        const ditGroup = document.getElementById('dit-mri-group');
-        if (attacks && attacks.value === '2') {
-            ditGroup.style.display = 'none';
-        } else {
-            ditGroup.style.display = 'block';
-        }
-    }
-
-    function changeStep(delta) {
-        let newStep = currentStep + delta;
-        if (newStep < 1) newStep = 1;
-        if (newStep > totalSteps) {
-            if (currentStep === totalSteps) {
-                runDiagnosis();
-            }
-            return;
-        }
-        currentStep = newStep;
-        updateStepUI();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    document.querySelectorAll('input[name="course"]').forEach(el => {
-        el.addEventListener('change', updateStepUI);
+function updateStepUI() {
+    document.querySelectorAll('.step').forEach((el, idx) => {
+        el.classList.toggle('active', idx === currentStep - 1);
     });
-    document.querySelectorAll('input[name="attacks"]').forEach(el => {
-        el.addEventListener('change', updateStepUI);
+    document.querySelectorAll('.step-indicator span').forEach((el, idx) => {
+        el.classList.toggle('active', idx === currentStep - 1);
     });
+    document.getElementById('prevBtn').disabled = (currentStep === 1);
+    document.getElementById('nextBtn').textContent = (currentStep === totalSteps) ? 'Завершить' : 'Далее';
 
+    const course = document.querySelector('input[name="course"]:checked');
+    document.getElementById('pp-group').style.display = (course && course.value === 'pp') ? 'block' : 'none';
+
+    const attacks = document.querySelector('input[name="attacks"]:checked');
+    document.getElementById('dit-mri-group').style.display = (attacks && attacks.value === '2') ? 'none' : 'block';
+}
+
+function changeStep(delta) {
+    let newStep = currentStep + delta;
+    if (newStep < 1) newStep = 1;
+    if (newStep > totalSteps) {
+        if (currentStep === totalSteps) runDiagnosis();
+        return;
+    }
+    currentStep = newStep;
     updateStepUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    // --- Основная логика диагностики (исправленная v3.0) ---
-    function runDiagnosis() {
-        // Проверка заполнения всех обязательных радио-групп
-        const requiredRadios = ['age', 'comorbid', 'course', 'attacks', 'central_vein', 'rim', 'spinal_count'];
-        const course = document.querySelector('input[name="course"]:checked')?.value;
-        if (course === 'pp') requiredRadios.push('progression');
-        let allFilled = true;
-        let missing = [];
-        requiredRadios.forEach(name => {
-            const checked = document.querySelector(`input[name="${name}"]:checked`);
-            if (!checked) {
-                allFilled = false;
-                missing.push(name);
-            }
-        });
-        if (!allFilled) {
-            alert('Пожалуйста, ответьте на все вопросы (особенно: ' + missing.join(', ') + ').');
-            return;
-        }
+document.querySelectorAll('input[name="course"], input[name="attacks"]').forEach(el => {
+    el.addEventListener('change', updateStepUI);
+});
 
-        // Сбор данных
-        const age = document.querySelector('input[name="age"]:checked').value;
-        const comorbid = document.querySelector('input[name="comorbid"]:checked').value;
-        const courseVal = course;
-        let progression = null;
-        if (courseVal === 'pp') {
-            progression = document.querySelector('input[name="progression"]:checked').value;
-        }
-        let attacks = document.querySelector('input[name="attacks"]:checked').value;
-        // Вопрос о новом приступе убран, так как теперь DIT определяется либо по атакам, либо по МРТ.
+/* Чекбокс "Нет коморбидностей" — управление остальными */
+const comorbidNone = document.getElementById('comorbid_none');
+const comorbidBoxes = document.querySelectorAll('input[name="comorbid"]');
+comorbidBoxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+        if (cb.checked) comorbidNone.checked = false;
+        if (!Array.from(comorbidBoxes).some(c => c.checked)) comorbidNone.checked = true;
+    });
+});
+comorbidNone.addEventListener('change', () => {
+    if (comorbidNone.checked) comorbidBoxes.forEach(c => c.checked = false);
+});
 
-        // МРТ области
-        const regions = {
-            optic: document.querySelector('input[name="region_optic"]').checked,
-            perivent: document.querySelector('input[name="region_perivent"]').checked,
-            juxta: document.querySelector('input[name="region_juxta"]').checked,
-            infratent: document.querySelector('input[name="region_infratent"]').checked,
-            spinal: document.querySelector('input[name="region_spinal"]').checked
-        };
-        const countRegions = Object.values(regions).filter(v => v).length;
+/* ===================== Утилиты ===================== */
+function getRadio(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+}
+function isChecked(id) {
+    const el = document.getElementById(id);
+    return !!(el && el.checked);
+}
+function getComorbidities() {
+    return Array.from(document.querySelectorAll('input[name="comorbid"]:checked'))
+        .map(el => el.value)
+        .filter(v => v !== 'none');
+}
+/* Select 6 (Panel 5, 2024):
+   - при общем числе очагов ≥ 10: CVS+ ≥ 6
+   - при общем числе очагов < 10: CVS+ составляет большинство */
+function calcCVSpositive(cvs, total) {
+    if (total <= 0) return false;
+    if (total >= 10) return cvs >= 6;
+    return cvs > total / 2;
+}
 
-        const spinalCount = document.querySelector('input[name="spinal_count"]:checked').value;
-        const hasSpinalLesions = (spinalCount !== '0');
-        const hasTwoOrMoreSpinal = (spinalCount === '2');
+/* ===================== Основная логика ===================== */
+function runDiagnosis() {
+    /* ---- Сбор данных ---- */
+    const age = getRadio('age') || '18-49';
+    const comorbidities = getComorbidities();
+    const hasComorbidities = comorbidities.length > 0;
 
-        const centralVein = document.querySelector('input[name="central_vein"]:checked').value === 'ge6';
-        const rim = document.querySelector('input[name="rim"]:checked').value === 'yes';
+    const course = getRadio('course') || 'rr';
+    const progression = (course === 'pp') ? getRadio('progression') : null;
+    const attacks = getRadio('attacks') || '2';
 
-        // DIT по МРТ (чекбоксы)
-        const ditNewLesions = document.querySelector('input[name="dit_new_lesions"]').checked;
-        const ditEnhNonenh = document.querySelector('input[name="dit_enh_nonenh"]').checked;
-        const ditMRI = ditNewLesions || ditEnhNonenh;
+    const ditNew = document.querySelector('input[name="dit_new_lesions"]').checked;
+    const ditEnh = document.querySelector('input[name="dit_enh_nonenh"]').checked;
+    const ditRad = ditNew || ditEnh;
 
-        // DIT считается выполненным, если ≥2 атак ИЛИ есть МРТ-признаки
-        const DIT = (attacks === '2') || ditMRI;
+    /* Регионы: зрительный нерв считается положительным, если отмечен хотя бы один метод (МРТ/ОКТ/ЗВП) */
+    const optic = isChecked('region_optic') || isChecked('optic_mri') || isChecked('optic_oct') || isChecked('optic_vep');
+    const perivent = isChecked('region_perivent');
+    const juxta    = isChecked('region_juxta');
+    const infratent= isChecked('region_infratent');
+    const spinalRegion = isChecked('region_spinal');
+    const regionsCount = [optic, perivent, juxta, infratent, spinalRegion].filter(Boolean).length;
 
-        const csfOcb = document.querySelector('input[name="csf_ocb"]').checked;
-        const csfKflc = document.querySelector('input[name="csf_kflc"]').checked;
-        const CSF = csfOcb || csfKflc;
+    const spinalCount = getRadio('spinal_count') || '0';
+    const totalLesions = parseInt(document.getElementById('totalLesions').value, 10) || 0;
+    const cvsCount = parseInt(document.getElementById('cvsCount').value, 10) || 0;
+    const prl = getRadio('prl') === 'yes';
 
-        // --- Алгоритм ---
+    const csfOCB = document.querySelector('input[name="csf_ocb"]').checked;
+    const csfKflc = document.querySelector('input[name="csf_kflc"]').checked;
+    const csfPositive = csfOCB || csfKflc;
 
-        let result = '';
-        let details = [];
-        let diagnosisType = ''; // 'rr', 'pp', 'sp'
+    const exclusionOk = document.querySelector('input[name="exclusion_ok"]').checked;
 
-        function addDetail(text) { details.push(text); }
+    /* ---- Производные значения ---- */
+    const cvsPos = calcCVSpositive(cvsCount, totalLesions);
+    const DIT = (attacks === '2') || ditRad;
 
-        // DIS определяется ТОЛЬКО по МРТ: ≥2 областей
-        const DIS_met = (countRegions >= 2);
-        const DIS_auto = (countRegions >= 4);
+    const disRegions = regionsCount >= 2;
+    const disSpinal  = (course === 'pp' && spinalCount === '2');   // ≥ 2 спинальных очага = DIS при прогрессирующем течении
+    const DIS_met    = disRegions || disSpinal;
+    const DIS_4plus  = regionsCount >= 4;
 
-        // Проверка возраст/коморбидности: требуется дополнительный фактор
-        let extraRequirement = false;
-        if (age === 'yes' || comorbid === 'yes') {
-            if (!(hasSpinalLesions || CSF || centralVein)) {
-                extraRequirement = true;
-                addDetail('❗ Для пациентов ≥50 лет или с коморбидностями требуется дополнительное подтверждение: очаг в спинном мозге, положительный CSF или симптом центральной вены.');
-            }
-        }
+    /* ---- Алгоритм ---- */
+    const details = [];
+    let diagnosisType = null;   // 'rr' | 'sp' | 'pp'
+    let result = '';
 
-        let diagnosisEstablished = false;
-
-        // Основная логика по типу течения
-        if (courseVal === 'pp') {
-            // Первично-прогрессирующий
-            if (progression !== 'yes') {
-                result = 'НЕДОСТАТОЧНО ДАННЫХ';
-                addDetail('Для ППРС требуется подтверждённое прогрессирование в течение ≥1 года.');
-            } else {
-                if (hasTwoOrMoreSpinal) {
-                    if (CSF || centralVein || DIT || DIS_auto) {
-                        diagnosisEstablished = true;
-                        diagnosisType = 'pp';
-                        addDetail('ППРС: ≥2 очагов в СМ + наличие CSF, центральной вены, DIT или ≥4 областей.');
-                    } else {
-                        result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                        addDetail('Есть ≥2 спинальных очагов, но требуется CSF, центральная вена, DIT или ≥4 областей.');
-                    }
-                } else {
-                    if (DIS_auto) {
-                        diagnosisEstablished = true;
-                        diagnosisType = 'pp';
-                        addDetail('ППРС: ≥4 областей на МРТ (автоматический DIS).');
-                    } else if ((CSF && centralVein) || (CSF && rim) || (DIT && centralVein) || (DIT && rim)) {
-                        diagnosisEstablished = true;
-                        diagnosisType = 'pp';
-                        addDetail('ППРС: менее 2 спинальных очагов, но есть комбинация (CSF+CVS, CSF+PRL, DIT+CVS, DIT+PRL).');
-                    } else {
-                        result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-                        addDetail('Для ППРС с <2 спинальными очагами требуется DIS_auto (≥4 областей) или комбинация двух маркеров.');
-                    }
-                }
-            }
-        } else {
-            // Ремиттирующий или вторично-прогрессирующий
-            if (attacks === '0') {
-                // РИС
-                if (DIS_met) {
-                    if (CSF || centralVein || DIT) {
-                        diagnosisEstablished = true;
-                        diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
-                        addDetail('РИС: DIS выполнен + CSF, центральная вена или DIT.');
-                    } else {
-                        result = 'НАБЛЮДЕНИЕ';
-                        addDetail('РИС: DIS выполнен, но нет CSF, центральной вены или DIT. Требуется наблюдение.');
-                    }
-                } else {
-                    result = 'РС МАЛОВЕРОЯТЕН';
-                    addDetail('Для РИС требуется DIS (≥2 областей).');
-                }
-            } else if (attacks === '1') {
-                // Один приступ
-                if (DIS_auto) {
-                    diagnosisEstablished = true;
-                    diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
-                    addDetail('Один приступ + ≥4 областей (автоматический DIS).');
-                } else if (DIS_met && (DIT || CSF)) {
-                    diagnosisEstablished = true;
-                    diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
-                    addDetail('Один приступ + DIS + DIT или CSF.');
-                } else if (countRegions === 1) {
-                    if ((CSF && centralVein) || (CSF && rim) || (DIT && centralVein) || (DIT && rim)) {
-                        diagnosisEstablished = true;
-                        diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
-                        addDetail('Одна область + комбинация (CSF+CVS, CSF+PRL, DIT+CVS или DIT+PRL).');
-                    } else {
-                        result = 'НАБЛЮДЕНИЕ';
-                        addDetail('Одна область, но нет требуемой комбинации. Требуется наблюдение.');
-                    }
-                } else {
-                    // countRegions === 0
-                    result = 'НАБЛЮДЕНИЕ';
-                    addDetail('Нет очагов на МРТ, но есть клинический приступ. Требуется наблюдение.');
-                }
-            } else { // attacks === '2'
-                // ≥2 атак: DIT считается выполненным автоматически
-                if (DIS_met) {
-                    diagnosisEstablished = true;
-                    diagnosisType = (courseVal === 'sp') ? 'sp' : 'rr';
-                    addDetail('≥2 приступов + DIS (≥2 областей на МРТ).');
-                } else {
-                    // DIS не выполнен
-                    if (countRegions > 0 || CSF || centralVein || DIT) {
-                        result = 'НАБЛЮДЕНИЕ';
-                        addDetail('≥2 приступов, но DIS не выполнен. Есть другие признаки – требуется наблюдение.');
-                    } else {
-                        result = 'РС МАЛОВЕРОЯТЕН';
-                        addDetail('Нет диссеминации в пространстве и нет других маркеров.');
-                    }
-                }
-            }
-        }
-
-        // Если extraRequirement активен и диагноз был установлен – отменяем
-        if (extraRequirement && diagnosisEstablished) {
-            diagnosisEstablished = false;
-            result = 'НАБЛЮДЕНИЕ';
-            addDetail('Из-за возраста/коморбидностей требуется дополнительный фактор, который не подтверждён. Наблюдение.');
-        }
-
-        // Формирование финального результата
-        let finalText = '';
-        if (diagnosisEstablished) {
-            let typeName = '';
-            if (diagnosisType === 'rr') typeName = 'ремиттирующий тип течения';
-            else if (diagnosisType === 'pp') typeName = 'первично-прогрессирующий тип течения';
-            else if (diagnosisType === 'sp') typeName = 'вторично-прогрессирующий тип течения';
-            finalText = 'Рассеянный склероз, ' + typeName;
-            result = finalText;
-        } else {
-            if (!result) {
-                // Если результат ещё не определён, проверяем наличие хоть каких-то признаков
-                if (countRegions > 0 || CSF || centralVein || DIT || (courseVal === 'pp' && progression === 'yes')) {
-                    result = 'НАБЛЮДЕНИЕ';
-                    addDetail('Есть отдельные признаки, но критерии не выполнены. Рекомендовано динамическое наблюдение.');
-                } else {
-                    result = 'РС МАЛОВЕРОЯТЕН';
-                    addDetail('Отсутствуют объективные данные, характерные для МС.');
-                }
-            }
-        }
-
-        // Вывод результата
-        const box = document.getElementById('resultBox');
-        box.style.display = 'block';
-        let html = '<span class="diagnosis ';
-        if (diagnosisEstablished) {
-            html += 'yes">✅ ' + result + '</span>';
-        } else if (result.includes('НАБЛЮДЕНИЕ')) {
-            html += 'observation">⏳ ' + result + '</span>';
-        } else {
-            html += 'no">❌ ' + result + '</span>';
-        }
-        html += '<div class="details">';
-        if (details.length === 0) {
-            html += '<p>Не удалось сформировать пояснение. Проверьте введённые данные.</p>';
-        } else {
-            details.forEach(d => { html += '<p>• ' + d + '</p>'; });
-        }
-        html += '</div>';
-        // Сводка
-        html += '<hr><p style="font-size:14px; color:#3a4a5e;"><strong>Сводка:</strong> ';
-        html += 'Областей: ' + countRegions + ', DIS: ' + (DIS_met ? 'да' : 'нет') + ', DIT: ' + (DIT ? 'да' : 'нет') + ', CSF+: ' + (CSF ? 'да' : 'нет');
-        html += ', центр.вена: ' + (centralVein ? 'да' : 'нет') + ', rim: ' + (rim ? 'да' : 'нет');
-        html += ', спинальных очагов: ' + spinalCount;
-        html += ', возраст≥50: ' + (age === 'yes' ? 'да' : 'нет') + ', коморбидности: ' + (comorbid === 'yes' ? 'да' : 'нет');
-        html += ', приступов: ' + attacks + (attacks === '2' ? ' (≥2)' : '');
-        html += ', тип течения: ' + courseVal;
-        html += '</p>';
-        box.innerHTML = html;
-        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (age === 'lt18') {
+        details.push('⚠️ Пациент < 18 лет. Инструмент предназначен для взрослых; педиатрические критерии имеют особенности (МОГ-АТ, ОДЭМ и др.). Интерпретация результатов ограничена.');
     }
 
-    document.addEventListener('DOMContentLoaded', updateStepUI);
+    if (course === 'pp') {
+        /* ===== Первично-прогрессирующее течение ===== */
+        if (progression !== 'yes') {
+            result = 'НЕДОСТАТОЧНО ДАННЫХ';
+            details.push('Для ППРС необходимо документированное прогрессирование ≥ 12 месяцев, независимое от обострений (Panel 6).');
+        } else if (DIS_4plus) {
+            diagnosisType = 'pp';
+            details.push('ППРС: прогрессирование ≥ 12 мес + ≥ 4 региона с типичными очагами — достаточно для диагноза без дополнительных критериев (Panel 4).');
+        } else if (DIS_met && (csfPositive || cvsPos || DIT)) {
+            diagnosisType = 'pp';
+            const pieces = [];
+            if (disRegions) pieces.push('≥ 2 региона');
+            if (disSpinal)  pieces.push('≥ 2 спинальных очага = DIS');
+            const markers = [];
+            if (csfPositive) markers.push('CSF+');
+            if (cvsPos)      markers.push('CVS+ (Select 6)');
+            if (DIT)         markers.push('DIT');
+            details.push(`ППРС: прогрессирование ≥ 12 мес + DIS (${pieces.join('; ')}) + ${markers.join(' / ')}.`);
+        } else if (regionsCount === 1 && (cvsPos || prl) && (DIT || csfPositive)) {
+            diagnosisType = 'pp';
+            const first = [];
+            if (cvsPos) first.push('CVS+');
+            if (prl)    first.push('PRL+');
+            const second = [];
+            if (DIT)         second.push('DIT');
+            if (csfPositive) second.push('CSF+');
+            details.push(`ППРС: прогрессирование ≥ 12 мес + 1 регион + (${first.join(' / ')}) + (${second.join(' / ')}).`);
+        } else {
+            result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
+            details.push('ППРС: прогрессирование есть, но критерии DIS и/или дополнительных маркеров (CSF+, CVS+, DIT) не выполнены.');
+        }
+    } else {
+        /* ===== Ремиттирующее или вторично-прогрессирующее ===== */
+        if (attacks === '2') {
+            /* ≥ 2 атак: DIT клинически выполнен */
+            if (DIS_met) {
+                diagnosisType = course;
+                const pieces = [];
+                if (disRegions) pieces.push('≥ 2 региона');
+                if (disSpinal)  pieces.push('≥ 2 спинальных очага');
+                details.push(`≥ 2 атак (DIT клинически) + DIS (${pieces.join('; ')}).`);
+            } else if (regionsCount === 1 && (cvsPos || prl)) {
+                diagnosisType = course;
+                const markers = [];
+                if (cvsPos) markers.push('CVS+');
+                if (prl)    markers.push('PRL+');
+                details.push(`≥ 2 атак (DIT клинически) + 1 регион + ${markers.join(' / ')}.`);
+            } else if (regionsCount === 0) {
+                result = 'РС МАЛОВЕРОЯТЕН';
+                details.push('≥ 2 атак, но ни одного типичного региона на МРТ.');
+            } else {
+                result = 'НАБЛЮДЕНИЕ';
+                details.push('≥ 2 атак, но DIS не выполнен и нет высокоспецифичных маркеров (CVS+ / PRL+) в единственном регионе.');
+            }
+        } else if (attacks === '1') {
+            /* КИС */
+            if (DIS_4plus) {
+                diagnosisType = course;
+                details.push('КИС + ≥ 4 региона с типичными очагами — достаточно для диагноза (Panel 4).');
+            } else if (DIS_met && (csfPositive || cvsPos || DIT)) {
+                diagnosisType = course;
+                const markers = [];
+                if (csfPositive) markers.push('CSF+');
+                if (cvsPos)      markers.push('CVS+ (Select 6)');
+                if (DIT)         markers.push('DIT');
+                details.push(`КИС + DIS (≥ 2 региона) + ${markers.join(' / ')}.`);
+            } else if (regionsCount === 1 && (cvsPos || prl) && (DIT || csfPositive)) {
+                diagnosisType = course;
+                const first = [];
+                if (cvsPos) first.push('CVS+');
+                if (prl)    first.push('PRL+');
+                const second = [];
+                if (DIT)         second.push('DIT');
+                if (csfPositive) second.push('CSF+');
+                details.push(`КИС + 1 регион + (${first.join(' / ')}) + (${second.join(' / ')}).`);
+            } else {
+                result = (regionsCount === 0) ? 'РС МАЛОВЕРОЯТЕН' : 'НАБЛЮДЕНИЕ';
+                details.push('КИС: недостаточно критериев для диагноза РС. Рекомендовано динамическое наблюдение.');
+            }
+        } else {
+            /* РИС (0 атак) */
+            if (DIS_met && (DIT || csfPositive || cvsPos)) {
+                diagnosisType = 'rr';
+                const markers = [];
+                if (DIT)         markers.push('DIT');
+                if (csfPositive) markers.push('CSF+');
+                if (cvsPos)      markers.push('CVS+ (Select 6)');
+                details.push(`РИС + DIS (≥ 2 региона) + ${markers.join(' / ')} (Panel 6).`);
+            } else if (DIS_met) {
+                result = 'НАБЛЮДЕНИЕ (РИС)';
+                details.push('РИС: DIS выполнен, но отсутствуют DIT, CSF+ или CVS+ — требуется наблюдение.');
+            } else {
+                result = 'РС МАЛОВЕРОЯТЕН';
+                details.push('РИС: DIS не выполнен (менее 2 типичных регионов ЦНС).');
+            }
+        }
+    }
+
+    /* ---- Проверка для возраста ≥ 50 лет / коморбидностей (Panel 7) ---- */
+    if (diagnosisType && (age === 'ge50' || hasComorbidities)) {
+        const additionalPresent = (spinalCount !== '0') || csfPositive || cvsPos;
+        if (!additionalPresent) {
+            details.push('⚠️ Пациент ≥ 50 лет и/или имеет коморбидности. Рекомендуется дополнительный подтверждающий признак (спинальный очаг, CSF+ или CVS+), который отсутствует. Диагноз не может быть уверенно подтверждён.');
+            diagnosisType = null;
+            result = 'НАБЛЮДЕНИЕ';
+        } else {
+            const addFeatures = [];
+            if (spinalCount !== '0') addFeatures.push('спинальный очаг');
+            if (csfPositive)         addFeatures.push('CSF+');
+            if (cvsPos)              addFeatures.push('CVS+');
+            details.push(`✓ Учтён дополнительный подтверждающий признак для возраста ≥ 50 / коморбидностей: ${addFeatures.join(', ')} (Panel 7).`);
+        }
+    }
+
+    /* ---- Исключение альтернативных диагнозов ---- */
+    if (!exclusionOk) {
+        details.unshift('⚠️ ВНИМАНИЕ: Альтернативные диагнозы не исключены. Диагноз РС может быть установлен только после исключения NMOSD, MOGAD, сосудистых, инфекционных, опухолевых и других заболеваний («no better explanation»).');
+    }
+
+    /* ---- Формирование финального результата ---- */
+    let finalDiagnosis = null;
+    if (diagnosisType) {
+        const typeName = {
+            'rr': 'ремиттирующий тип течения',
+            'sp': 'вторично-прогрессирующий тип течения',
+            'pp': 'первично-прогрессирующий тип течения'
+        }[diagnosisType];
+        finalDiagnosis = 'Рассеянный склероз, ' + typeName;
+    } else if (!result) {
+        result = 'НАБЛЮДЕНИЕ';
+        details.push('Критерии диагноза РС не выполнены. Рекомендовано динамическое наблюдение.');
+    }
+
+    /* ---- Вывод ---- */
+    const box = document.getElementById('resultBox');
+    box.style.display = 'block';
+    let html = '';
+    if (finalDiagnosis) {
+        html += '<span class="diagnosis yes">✅ ' + finalDiagnosis + '</span>';
+    } else if (result.includes('НАБЛЮДЕНИЕ')) {
+        html += '<span class="diagnosis observation">⏳ ' + result + '</span>';
+    } else if (result.includes('НЕДОСТАТОЧНО')) {
+        html += '<span class="diagnosis observation">⚠️ ' + result + '</span>';
+    } else {
+        html += '<span class="diagnosis no">❌ ' + result + '</span>';
+    }
+
+    html += '<div class="details">';
+    details.forEach(d => { html += '<p>• ' + d + '</p>'; });
+    html += '</div>';
+
+    /* ---- Сводка ---- */
+    const regionList = [
+        optic && 'зрит.нерв',
+        perivent && 'перивентр.',
+        juxta && 'юкстакорт.',
+        infratent && 'инфратентор.',
+        spinalRegion && 'спинной мозг'
+    ].filter(Boolean).join(', ') || '—';
+
+    html += '<div class="summary"><strong>Сводка:</strong><br>';
+    html += 'Регионов затронуто: <b>' + regionsCount + ' из 5</b> (' + regionList + ')<br>';
+    html += 'DIS: ' + (DIS_met ? 'выполнен' : 'не выполнен') +
+            ' | DIS (≥ 4 регионов): ' + (DIS_4plus ? 'да' : 'нет') +
+            ' | DIT: ' + (DIT ? 'да' : 'нет') +
+            ' | CSF+: ' + (csfPositive ? 'да' : 'нет') + '<br>';
+    html += 'CVS+ (Select 6): ' + (cvsPos ? 'да' : 'нет') +
+            ' (CVS+ ' + cvsCount + ' из ' + totalLesions + ' очагов)' +
+            ' | PRL+: ' + (prl ? 'да' : 'нет') +
+            ' | Спинальных очагов: ' + spinalCount + '<br>';
+    html += 'Возраст: ' + age +
+            ' | Коморбидности: ' + (hasComorbidities ? comorbidities.join(', ') : 'нет') +
+            ' | Атак: ' + attacks +
+            ' | Фенотип: ' + course.toUpperCase() +
+            ' | Исключение альтернатив: ' + (exclusionOk ? 'да' : 'НЕТ');
+    html += '</div>';
+
+    box.innerHTML = html;
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.addEventListener('DOMContentLoaded', updateStepUI);
 </script>
 </body>
 </html>
