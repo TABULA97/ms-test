@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Диагностика РС по критериям Макдональда 2024</title>
+<title>Критерии МакДональда 2024</title>
 <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body {
@@ -190,8 +190,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>🧠 Диагностика рассеянного склероза</h1>
-    <div class="version">Критерии Макдональда 2024 (для взрослых)</div>
+    <h1>🧠 Критерии МакДональда 2024</h1>
+    <div class="version">Взрослые, ≥ 18 лет</div>
     <div class="step-indicator">
         <span id="step1-label" class="active">1. Общие данные</span>
         <span id="step2-label">2. МРТ / визуальные пути</span>
@@ -204,7 +204,6 @@
         <div class="question-group">
             <label class="title">Возраст</label>
             <div class="options">
-                <label><input type="radio" name="age" value="lt18"> &lt; 18 лет</label>
                 <label><input type="radio" name="age" value="18-49" checked> 18–49 лет</label>
                 <label><input type="radio" name="age" value="ge50"> ≥ 50 лет</label>
             </div>
@@ -480,10 +479,6 @@ function runDiagnosis() {
     const details = [];
     let diagnosisType = null;   // 'rr' | 'sp' | 'pp'
     let result = '';
-
-    if (age === 'lt18') {
-        details.push('⚠️ Пациент < 18 лет. Инструмент предназначен для взрослых; педиатрические критерии имеют особенности (МОГ-АТ, ОДЭМ и др.). Интерпретация результатов ограничена.');
-    }
 
     if (course === 'pp') {
         /* ===== Первично-прогрессирующее течение ===== */
