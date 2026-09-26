@@ -96,6 +96,7 @@
       <div class="quiz-top">
         <span id="question-counter"></span>
         <span id="score-counter"></span>
+        <span>Время: <strong id="timer">00:00</strong></span>
       </div>
       <div class="progress-track" role="progressbar" aria-label="Прогресс теста" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="progress-bar" id="progress-bar"></div>
@@ -105,6 +106,8 @@
       <p class="feedback" id="feedback" aria-live="polite"></p>
       <div class="quiz-controls">
         <button id="next-button" class="primary-button" disabled>Следующий вопрос</button>
+        <button id="restart-during-quiz" class="secondary-button">Пройти заново</button>
+        <button id="exit-quiz" class="secondary-button">Выйти из теста</button>
       </div>
     </section>
 
@@ -113,6 +116,7 @@
       <p>Ваш результат:</p>
       <p class="score" id="final-score"></p>
       <p id="result-message"></p>
+      <p>Время прохождения: <strong id="final-time"></strong></p>
       <div class="quiz-controls" style="justify-content:center">
         <button id="restart-button" class="primary-button">Пройти ещё раз</button>
       </div>
@@ -177,6 +181,26 @@
     let questionIndex = 0;
     let score = 0;
     let answered = false;
+    let startTime = 0;
+    let timerInterval = null;
+
+    function formatTime(totalSeconds) {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      const mmss = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      return hours > 0 ? `${String(hours).padStart(2, "0")}:${mmss}` : mmss;
+    }
+
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById("timer").textContent = formatTime(elapsed);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
 
     // Перемешивание Фишера — Йетса.
     function shuffle(items) {
@@ -198,6 +222,10 @@
       startScreen.hidden = true;
       resultScreen.hidden = true;
       quizScreen.hidden = false;
+      startTime = Date.now();
+      document.getElementById("timer").textContent = "00:00";
+      stopTimer();
+      timerInterval = setInterval(updateTimer, 1000);
       showQuestion();
     }
 
@@ -256,10 +284,13 @@
     });
 
     function showResult() {
+      updateTimer();
+      stopTimer();
       quizScreen.hidden = true;
       resultScreen.hidden = false;
       const percentage = Math.round((score / questions.length) * 100);
       document.getElementById("final-score").textContent = `${score} из ${questions.length} — ${percentage}%`;
+      document.getElementById("final-time").textContent = document.getElementById("timer").textContent;
       let message = "Хорошая работа!";
       if (percentage === 100) message = "Отличный результат — все ответы правильные!";
       else if (percentage < 50) message = "Можно повторить материал и пройти тест ещё раз.";
@@ -268,6 +299,21 @@
 
     document.getElementById("start-button").addEventListener("click", startQuiz);
     document.getElementById("restart-button").addEventListener("click", startQuiz);
+
+    document.getElementById("restart-during-quiz").addEventListener("click", () => {
+      if (window.confirm("Начать тест заново? Текущий результат будет сброшен.")) {
+        startQuiz();
+      }
+    });
+
+    document.getElementById("exit-quiz").addEventListener("click", () => {
+      if (window.confirm("Выйти из теста? Текущий прогресс и результат не сохранятся.")) {
+        stopTimer();
+        quizScreen.hidden = true;
+        resultScreen.hidden = true;
+        startScreen.hidden = false;
+      }
+    });
   </script>
 </body>
 </html>
