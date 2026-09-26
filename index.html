@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Тест по неврологии</title>
+  <title>Тесты по неврологии</title>
   <style>
     :root {
       color-scheme: light;
       --background: #f3f6fb;
-      --card: #ffffff;
+      --card: #fff;
       --text: #172033;
       --muted: #667085;
       --primary: #3157c8;
@@ -19,9 +19,7 @@
       --error: #bb2e37;
       --error-bg: #fff0f0;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       min-height: 100vh;
@@ -31,27 +29,10 @@
       font-family: Arial, Helvetica, sans-serif;
       line-height: 1.5;
     }
-
-    .container {
-      width: min(100%, 760px);
-      margin: 0 auto;
-    }
-
-    header {
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0 0 8px;
-      font-size: clamp(1.7rem, 5vw, 2.4rem);
-    }
-
-    header p {
-      margin: 0;
-      color: var(--muted);
-    }
-
+    .container { width: min(100%, 760px); margin: 0 auto; }
+    header { margin-bottom: 24px; text-align: center; }
+    header h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 5vw, 2.4rem); }
+    header p { margin: 0; color: var(--muted); }
     .card {
       padding: clamp(20px, 5vw, 36px);
       border: 1px solid var(--border);
@@ -59,166 +40,43 @@
       background: var(--card);
       box-shadow: 0 10px 30px rgb(31 48 84 / 7%);
     }
-
-    .upload-area {
-      margin: 20px 0;
-      padding: 22px;
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    input[type="file"] {
-      display: block;
-      width: 100%;
-      margin-top: 12px;
-    }
-
-    .hint, .muted {
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .status {
-      min-height: 24px;
-      margin: 12px 0;
-      color: var(--muted);
-    }
-
-    .error-message { color: var(--error); }
-
-    button {
-      font: inherit;
-    }
-
     .primary-button, .secondary-button {
       min-height: 46px;
       padding: 10px 18px;
       border: 0;
       border-radius: 10px;
       cursor: pointer;
+      font: inherit;
       font-weight: 700;
     }
-
-    .primary-button {
-      background: var(--primary);
-      color: white;
-    }
-
-    .primary-button:hover:not(:disabled) {
-      background: var(--primary-hover);
-    }
-
-    .secondary-button {
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--text);
-    }
-
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-    }
-
-    .quiz-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .progress-track {
-      height: 8px;
-      overflow: hidden;
-      margin-bottom: 26px;
-      border-radius: 99px;
-      background: #e9edf5;
-    }
-
-    .progress-bar {
-      width: 0;
-      height: 100%;
-      border-radius: inherit;
-      background: var(--primary);
-      transition: width 0.2s ease;
-    }
-
-    .question {
-      margin: 0 0 22px;
-      font-size: clamp(1.2rem, 4vw, 1.55rem);
-      line-height: 1.35;
-    }
-
-    .answers {
-      display: grid;
-      gap: 12px;
-    }
-
+    .primary-button { background: var(--primary); color: white; }
+    .primary-button:hover:not(:disabled) { background: var(--primary-hover); }
+    .secondary-button { border: 1px solid var(--border); background: white; color: var(--text); }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+    .quiz-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; color: var(--muted); font-size: .95rem; }
+    .progress-track { height: 8px; overflow: hidden; margin-bottom: 26px; border-radius: 99px; background: #e9edf5; }
+    .progress-bar { width: 0; height: 100%; border-radius: inherit; background: var(--primary); transition: width .2s ease; }
+    .question { margin: 0 0 22px; font-size: clamp(1.2rem, 4vw, 1.55rem); line-height: 1.35; }
+    .answers { display: grid; gap: 12px; }
     .answer-button {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: white;
-      color: var(--text);
-      text-align: left;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
+      width: 100%; padding: 14px 16px; border: 1px solid var(--border);
+      border-radius: 10px; background: white; color: var(--text); text-align: left;
+      cursor: pointer; font: inherit; transition: border-color .15s, background .15s;
     }
-
-    .answer-button:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: #f7f9ff;
-    }
-
-    .answer-button.correct {
-      border-color: var(--success);
-      background: var(--success-bg);
-    }
-
-    .answer-button.incorrect {
-      border-color: var(--error);
-      background: var(--error-bg);
-    }
-
-    .feedback {
-      min-height: 28px;
-      margin: 16px 0;
-      font-weight: 700;
-    }
-
+    .answer-button:hover:not(:disabled) { border-color: var(--primary); background: #f7f9ff; }
+    .answer-button.correct { border-color: var(--success); background: var(--success-bg); }
+    .answer-button.incorrect { border-color: var(--error); background: var(--error-bg); }
+    .feedback { min-height: 28px; margin: 16px 0; font-weight: 700; }
     .feedback.correct-text { color: var(--success); }
     .feedback.incorrect-text { color: var(--error); }
-
-    .quiz-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .result {
-      text-align: center;
-    }
-
-    .result h2 {
-      margin-top: 0;
-    }
-
-    .score {
-      margin: 16px 0;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
+    .quiz-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .result { text-align: center; }
+    .result h2 { margin-top: 0; }
+    .score { margin: 16px 0; color: var(--primary); font-size: 2rem; font-weight: 800; }
     [hidden] { display: none !important; }
-
     @media (max-width: 480px) {
       body { padding: 20px 12px; }
-      .quiz-top { font-size: 0.85rem; }
+      .quiz-top { font-size: .85rem; }
       .quiz-controls > button { flex: 1; }
     }
   </style>
@@ -226,28 +84,12 @@
 <body>
   <main class="container">
     <header>
-      <h1>Тест по неврологии</h1>
-      <p>Проверьте свои знания и узнайте результат в конце.</p>
+      <h1>Тесты по неврологии</h1>
+      <p>Проверь свои знания</p>
     </header>
 
-    <section class="card" id="upload-screen">
-      <h2>Загрузите файл с вопросами</h2>
-      <p class="hint">
-        Поддерживается TXT в UTF-8. Правильный ответ отмечайте знаком
-        <strong>+</strong>, неправильные — знаком <strong>−</strong>.
-      </p>
-
-      <div class="upload-area">
-        <label for="file-input"><strong>Выберите TXT-файл</strong></label>
-        <input id="file-input" type="file" accept=".txt,text/plain">
-      </div>
-
-      <p id="file-status" class="status" role="status" aria-live="polite">
-        Файл ещё не загружен.
-      </p>
-      <button id="start-button" class="primary-button" disabled>
-        Начать тест
-      </button>
+    <section class="card" id="start-screen" style="text-align:center">
+      <button id="start-button" class="primary-button">Начать тест</button>
     </section>
 
     <section class="card" id="quiz-screen" hidden>
@@ -255,29 +97,14 @@
         <span id="question-counter"></span>
         <span id="score-counter"></span>
       </div>
-
-      <div
-        class="progress-track"
-        role="progressbar"
-        aria-label="Прогресс теста"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-valuenow="0"
-      >
+      <div class="progress-track" role="progressbar" aria-label="Прогресс теста" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="progress-bar" id="progress-bar"></div>
       </div>
-
       <h2 class="question" id="question-text"></h2>
       <div class="answers" id="answers"></div>
       <p class="feedback" id="feedback" aria-live="polite"></p>
-
       <div class="quiz-controls">
-        <button id="next-button" class="primary-button" disabled>
-          Следующий вопрос
-        </button>
-        <button id="back-button" class="secondary-button">
-          К загрузке файла
-        </button>
+        <button id="next-button" class="primary-button" disabled>Следующий вопрос</button>
       </div>
     </section>
 
@@ -287,25 +114,56 @@
       <p class="score" id="final-score"></p>
       <p id="result-message"></p>
       <div class="quiz-controls" style="justify-content:center">
-        <button id="restart-button" class="primary-button">
-          Пройти ещё раз
-        </button>
-        <button id="new-file-button" class="secondary-button">
-          Загрузить другой файл
-        </button>
+        <button id="restart-button" class="primary-button">Пройти ещё раз</button>
       </div>
     </section>
   </main>
 
   <script>
-    const fileInput = document.getElementById("file-input");
-    const fileStatus = document.getElementById("file-status");
-    const startButton = document.getElementById("start-button");
+    // Все вопросы находятся в самом сайте — посетителю не нужно ничего загружать.
+    // Чтобы добавить вопросы, добавьте новые объекты в этот массив.
+    const questionBank = [
+      {
+        text: "Какое сочетание признаков наиболее характерно для синдрома Горнера?",
+        answers: [
+          { text: "Мидриаз, птоз, слезотечение", correct: false },
+          { text: "Миоз, птоз, энофтальм", correct: true },
+          { text: "Миоз, птоз, двоение", correct: false },
+          { text: "Мидриаз, экзофтальм, гипергидроз", correct: false }
+        ]
+      },
+      {
+        text: "Повреждение какой системы приводит к развитию синдрома Горнера?",
+        answers: [
+          { text: "Парасимпатической иннервации", correct: false },
+          { text: "Соматической иннервации", correct: false },
+          { text: "Симпатической иннервации", correct: true },
+          { text: "Чувствительных волокон тройничного нерва", correct: false }
+        ]
+      },
+      {
+        text: "На какой стороне обычно проявляются признаки синдрома Горнера?",
+        answers: [
+          { text: "На противоположной стороне от поражения", correct: false },
+          { text: "На той же стороне, что и поражение симпатического пути", correct: true },
+          { text: "С обеих сторон в равной степени", correct: false },
+          { text: "Сторона проявлений зависит только от возраста пациента", correct: false }
+        ]
+      },
+      {
+        text: "Длительность неврологических расстройств при транзиторной ишемической атаке обычно не превышает:",
+        answers: [
+          { text: "24 часов", correct: true },
+          { text: "48 часов", correct: false },
+          { text: "7 дней", correct: false },
+          { text: "30 дней", correct: false }
+        ]
+      }
+    ];
 
-    const uploadScreen = document.getElementById("upload-screen");
+    const startScreen = document.getElementById("start-screen");
     const quizScreen = document.getElementById("quiz-screen");
     const resultScreen = document.getElementById("result-screen");
-
     const questionCounter = document.getElementById("question-counter");
     const scoreCounter = document.getElementById("score-counter");
     const progressBar = document.getElementById("progress-bar");
@@ -315,7 +173,6 @@
     const feedback = document.getElementById("feedback");
     const nextButton = document.getElementById("next-button");
 
-    let loadedQuestions = [];
     let questions = [];
     let questionIndex = 0;
     let score = 0;
@@ -324,158 +181,39 @@
     // Перемешивание Фишера — Йетса.
     function shuffle(items) {
       const result = [...items];
-
       for (let i = result.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [result[i], result[j]] = [result[j], result[i]];
       }
-
       return result;
     }
 
-    // Формат TXT:
-    // 1. Текст вопроса?
-    // + Правильный вариант
-    // − Неправильный вариант
-    function parseQuestions(text) {
-      const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
-      const parsed = [];
-      let currentQuestion = null;
-
-      function saveCurrentQuestion() {
-        if (!currentQuestion) return;
-
-        if (currentQuestion.answers.length < 2) {
-          throw new Error(
-            `Вопрос «${currentQuestion.text}» должен содержать минимум два варианта ответа.`
-          );
-        }
-
-        const correctAnswers = currentQuestion.answers.filter(
-          answer => answer.correct
-        ).length;
-
-        if (correctAnswers !== 1) {
-          throw new Error(
-            `У вопроса «${currentQuestion.text}» должен быть ровно один правильный ответ, отмеченный знаком +.`
-          );
-        }
-
-        parsed.push(currentQuestion);
-      }
-
-      for (const rawLine of lines) {
-        const line = rawLine.trim();
-        if (!line) continue;
-
-        const questionMatch = line.match(/^\d+[.)]\s*(.+)$/);
-
-        if (questionMatch) {
-          saveCurrentQuestion();
-          currentQuestion = {
-            text: questionMatch[1].trim(),
-            answers: []
-          };
-          continue;
-        }
-
-        const answerMatch = line.match(/^([+−–-])\s*(.+)$/);
-
-        if (answerMatch && currentQuestion) {
-          currentQuestion.answers.push({
-            text: answerMatch[2].trim(),
-            correct: answerMatch[1] === "+"
-          });
-        } else if (currentQuestion) {
-          // Если текст вопроса или варианта случайно перенесён на следующую строку.
-          const lastAnswer =
-            currentQuestion.answers[currentQuestion.answers.length - 1];
-
-          if (lastAnswer) {
-            lastAnswer.text += " " + line;
-          } else {
-            currentQuestion.text += " " + line;
-          }
-        }
-      }
-
-      saveCurrentQuestion();
-
-      if (parsed.length === 0) {
-        throw new Error(
-          "Не удалось найти вопросы. Проверьте формат файла и нумерацию вопросов."
-        );
-      }
-
-      return parsed;
-    }
-
-    fileInput.addEventListener("change", async () => {
-      const file = fileInput.files[0];
-      loadedQuestions = [];
-      startButton.disabled = true;
-
-      if (!file) {
-        fileStatus.textContent = "Файл ещё не загружен.";
-        fileStatus.classList.remove("error-message");
-        return;
-      }
-
-      try {
-        const text = await file.text();
-        loadedQuestions = parseQuestions(text);
-        fileStatus.textContent =
-          `Загружено вопросов: ${loadedQuestions.length} (${file.name})`;
-        fileStatus.classList.remove("error-message");
-        startButton.disabled = false;
-      } catch (error) {
-        fileStatus.textContent = error.message;
-        fileStatus.classList.add("error-message");
-      }
-    });
-
-    startButton.addEventListener("click", startQuiz);
-
     function startQuiz() {
-      if (!loadedQuestions.length) return;
-
-      // Копируем вопросы, чтобы повторный запуск не портил исходный список.
-      questions = loadedQuestions.map(question => ({
+      questions = shuffle(questionBank).map(question => ({
         text: question.text,
         answers: shuffle(question.answers)
       }));
-
       questionIndex = 0;
       score = 0;
-
-      uploadScreen.hidden = true;
+      startScreen.hidden = true;
       resultScreen.hidden = true;
       quizScreen.hidden = false;
-
       showQuestion();
     }
 
     function showQuestion() {
       const question = questions[questionIndex];
       answered = false;
-
-      questionCounter.textContent =
-        `Вопрос ${questionIndex + 1} из ${questions.length}`;
+      questionCounter.textContent = `Вопрос ${questionIndex + 1} из ${questions.length}`;
       scoreCounter.textContent = `Правильных ответов: ${score}`;
-
       const progress = (questionIndex / questions.length) * 100;
       progressBar.style.width = `${progress}%`;
       progressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
-
       questionText.textContent = question.text;
       feedback.textContent = "";
       feedback.className = "feedback";
       nextButton.disabled = true;
-      nextButton.textContent =
-        questionIndex === questions.length - 1
-          ? "Завершить тест"
-          : "Следующий вопрос";
-
+      nextButton.textContent = questionIndex === questions.length - 1 ? "Завершить тест" : "Следующий вопрос";
       answersContainer.replaceChildren();
 
       question.answers.forEach((answer, index) => {
@@ -491,16 +229,10 @@
     function chooseAnswer(selectedButton, selectedAnswer) {
       if (answered) return;
       answered = true;
-
-      const answerButtons = answersContainer.querySelectorAll(".answer-button");
-
-      answerButtons.forEach((button, index) => {
-        const answer = questions[questionIndex].answers[index];
+      const buttons = answersContainer.querySelectorAll(".answer-button");
+      buttons.forEach((button, index) => {
         button.disabled = true;
-
-        if (answer.correct) {
-          button.classList.add("correct");
-        }
+        if (questions[questionIndex].answers[index].correct) button.classList.add("correct");
       });
 
       if (selectedAnswer.correct) {
@@ -512,53 +244,30 @@
         feedback.textContent = "Неверно. Правильный ответ отмечен зелёным.";
         feedback.classList.add("incorrect-text");
       }
-
       scoreCounter.textContent = `Правильных ответов: ${score}`;
       nextButton.disabled = false;
     }
 
     nextButton.addEventListener("click", () => {
       if (!answered) return;
-
       questionIndex++;
-
-      if (questionIndex < questions.length) {
-        showQuestion();
-      } else {
-        showResult();
-      }
+      if (questionIndex < questions.length) showQuestion();
+      else showResult();
     });
 
     function showResult() {
       quizScreen.hidden = true;
       resultScreen.hidden = false;
-
       const percentage = Math.round((score / questions.length) * 100);
-      document.getElementById("final-score").textContent =
-        `${score} из ${questions.length} — ${percentage}%`;
-
+      document.getElementById("final-score").textContent = `${score} из ${questions.length} — ${percentage}%`;
       let message = "Хорошая работа!";
-      if (percentage === 100) {
-        message = "Отличный результат — все ответы правильные!";
-      } else if (percentage < 50) {
-        message = "Можно повторить материал и пройти тест ещё раз.";
-      }
-
+      if (percentage === 100) message = "Отличный результат — все ответы правильные!";
+      else if (percentage < 50) message = "Можно повторить материал и пройти тест ещё раз.";
       document.getElementById("result-message").textContent = message;
     }
 
-    document.getElementById("back-button").addEventListener("click", () => {
-      quizScreen.hidden = true;
-      resultScreen.hidden = true;
-      uploadScreen.hidden = false;
-    });
-
+    document.getElementById("start-button").addEventListener("click", startQuiz);
     document.getElementById("restart-button").addEventListener("click", startQuiz);
-
-    document.getElementById("new-file-button").addEventListener("click", () => {
-      resultScreen.hidden = true;
-      uploadScreen.hidden = false;
-    });
   </script>
 </body>
 </html>
