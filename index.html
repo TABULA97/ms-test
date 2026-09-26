@@ -1,667 +1,564 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Критерии МакДональда 2024</title>
-<style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тест по неврологии</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #f3f6fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --primary: #3157c8;
+      --primary-hover: #2445aa;
+      --border: #d9e0ec;
+      --success: #16794b;
+      --success-bg: #e8f6ef;
+      --error: #bb2e37;
+      --error-bg: #fff0f0;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-        background: #f4f7fc;
-        margin: 0;
-        padding: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh;
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 16px;
+      background: var(--background);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
     }
+
     .container {
-        max-width: 880px;
-        width: 100%;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        padding: 30px 35px;
+      width: min(100%, 760px);
+      margin: 0 auto;
     }
-    h1 {
-        font-size: 24px;
-        color: #1a2b4c;
-        border-bottom: 2px solid #e6edf5;
-        padding-bottom: 15px;
-        margin-top: 0;
-        text-align: center;
+
+    header {
+      margin-bottom: 24px;
+      text-align: center;
     }
-    .version {
-        font-size: 14px;
-        color: #6b7a8f;
-        text-align: center;
-        margin-bottom: 15px;
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.7rem, 5vw, 2.4rem);
     }
-    .step-indicator {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 25px;
-        font-size: 13px;
-        color: #6b7a8f;
-        flex-wrap: wrap;
-        gap: 6px;
+
+    header p {
+      margin: 0;
+      color: var(--muted);
     }
-    .step-indicator span {
-        background: #e6edf5;
-        padding: 5px 12px;
-        border-radius: 20px;
-        transition: 0.3s;
+
+    .card {
+      padding: clamp(20px, 5vw, 36px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: 0 10px 30px rgb(31 48 84 / 7%);
     }
-    .step-indicator span.active {
-        background: #1a2b4c;
-        color: white;
+
+    .upload-area {
+      margin: 20px 0;
+      padding: 22px;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      text-align: center;
     }
-    .step { display: none; animation: fade 0.3s ease; }
-    .step.active { display: block; }
-    @keyframes fade {
-        from { opacity: 0.4; transform: translateY(8px); }
-        to   { opacity: 1; transform: translateY(0); }
+
+    input[type="file"] {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
     }
-    .question-group { margin-bottom: 20px; }
-    .question-group > label.title {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #1f3a5f;
+
+    .hint, .muted {
+      color: var(--muted);
+      font-size: 0.92rem;
     }
-    .question-group .hint {
-        font-size: 13px;
-        color: #5e6f86;
-        margin: 4px 0 8px;
-        font-weight: normal;
-        line-height: 1.5;
+
+    .status {
+      min-height: 24px;
+      margin: 12px 0;
+      color: var(--muted);
     }
-    .options { display: flex; gap: 16px; flex-wrap: wrap; }
-    .options label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 400;
-        cursor: pointer;
-        background: #f8faff;
-        padding: 6px 14px;
-        border-radius: 30px;
-        border: 1px solid #dce3ed;
-        transition: 0.2s;
+
+    .error-message { color: var(--error); }
+
+    button {
+      font: inherit;
     }
-    .options label:hover { background: #eef4fb; }
-    .options input[type="radio"], .options input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: #1a2b4c;
+
+    .primary-button, .secondary-button {
+      min-height: 46px;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
     }
-    .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
-    .checkbox-group.vertical {
-        flex-direction: column;
-        align-items: flex-start;
+
+    .primary-button {
+      background: var(--primary);
+      color: white;
     }
-    .checkbox-group label {
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-        font-weight: 400;
-        cursor: pointer;
-        background: #f8faff;
-        padding: 6px 12px;
-        border-radius: 12px;
-        border: 1px solid #dce3ed;
-        line-height: 1.4;
-        font-size: 14px;
+
+    .primary-button:hover:not(:disabled) {
+      background: var(--primary-hover);
     }
-    .checkbox-group label:hover { background: #eef4fb; }
-    .number-input {
-        width: 90px;
-        padding: 6px 10px;
-        border: 1px solid #dce3ed;
-        border-radius: 8px;
-        font-size: 15px;
+
+    .secondary-button {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
     }
-    .nav-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 30px;
-        border-top: 1px solid #e6edf5;
-        padding-top: 25px;
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
     }
-    .nav-buttons button {
-        background: #1a2b4c;
-        color: white;
-        border: none;
-        padding: 10px 30px;
-        border-radius: 30px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.2s;
-        font-weight: 500;
+
+    .quiz-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
-    .nav-buttons button:hover:not(:disabled) { background: #0f1d33; }
-    .nav-buttons button:disabled { background: #b0c0d0; cursor: default; }
-    .nav-buttons button.secondary { background: #e6edf5; color: #1a2b4c; }
-    .nav-buttons button.secondary:hover:not(:disabled) { background: #d0dae8; }
-    .result-box {
-        background: #ebf5ff;
-        border-left: 6px solid #1a2b4c;
-        padding: 20px 25px;
-        border-radius: 10px;
-        margin-top: 20px;
-        font-size: 16px;
-        line-height: 1.6;
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 26px;
+      border-radius: 99px;
+      background: #e9edf5;
     }
-    .result-box .diagnosis {
-        font-size: 22px;
-        font-weight: 700;
-        display: block;
-        margin-bottom: 12px;
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--primary);
+      transition: width 0.2s ease;
     }
-    .result-box .diagnosis.yes { color: #0a7e3c; }
-    .result-box .diagnosis.no { color: #b33a3a; }
-    .result-box .diagnosis.observation { color: #b38f3a; }
-    .result-box .details p { margin: 6px 0; color: #1f3a5f; }
-    .result-box .warning { color: #b33a3a; font-weight: 600; }
-    .summary {
-        background: #f8faff;
-        padding: 12px 16px;
-        border-radius: 8px;
-        font-size: 13px;
-        color: #3a4a5e;
-        margin-top: 16px;
-        line-height: 1.7;
+
+    .question {
+      margin: 0 0 22px;
+      font-size: clamp(1.2rem, 4vw, 1.55rem);
+      line-height: 1.35;
     }
-    footer {
-        margin-top: 30px;
-        font-size: 13px;
-        color: #8a9aa8;
-        text-align: center;
-        border-top: 1px solid #e6edf5;
-        padding-top: 20px;
+
+    .answers {
+      display: grid;
+      gap: 12px;
     }
-    @media (max-width: 600px) {
-        .container { padding: 20px; }
-        .options { gap: 10px; }
-        .options label { padding: 5px 12px; font-size: 14px; }
-        .nav-buttons button { padding: 8px 20px; font-size: 14px; }
+
+    .answer-button {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
     }
-</style>
+
+    .answer-button:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: #f7f9ff;
+    }
+
+    .answer-button.correct {
+      border-color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .answer-button.incorrect {
+      border-color: var(--error);
+      background: var(--error-bg);
+    }
+
+    .feedback {
+      min-height: 28px;
+      margin: 16px 0;
+      font-weight: 700;
+    }
+
+    .feedback.correct-text { color: var(--success); }
+    .feedback.incorrect-text { color: var(--error); }
+
+    .quiz-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .result {
+      text-align: center;
+    }
+
+    .result h2 {
+      margin-top: 0;
+    }
+
+    .score {
+      margin: 16px 0;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    [hidden] { display: none !important; }
+
+    @media (max-width: 480px) {
+      body { padding: 20px 12px; }
+      .quiz-top { font-size: 0.85rem; }
+      .quiz-controls > button { flex: 1; }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <h1>🧠 Критерии МакДональда 2024</h1>
-    <div class="version">Взрослые, ≥ 18 лет</div>
-    <div class="step-indicator">
-        <span id="step1-label" class="active">1. Общие данные</span>
-        <span id="step2-label">2. МРТ / визуальные пути</span>
-        <span id="step3-label">3. Ликвор</span>
-        <span id="step4-label">4. Результат</span>
-    </div>
+  <main class="container">
+    <header>
+      <h1>Тест по неврологии</h1>
+      <p>Проверьте свои знания и узнайте результат в конце.</p>
+    </header>
 
-    <!-- ШАГ 1 -->
-    <div id="step1" class="step active">
-        <div class="question-group">
-            <label class="title">Возраст</label>
-            <div class="options">
-                <label><input type="radio" name="age" value="18-49" checked> 18–49 лет</label>
-                <label><input type="radio" name="age" value="ge50"> ≥ 50 лет</label>
-            </div>
-            <p class="hint">При возрасте ≥ 50 лет требуются дополнительные подтверждающие признаки (см. шаг 2 и результат).</p>
-        </div>
+    <section class="card" id="upload-screen">
+      <h2>Загрузите файл с вопросами</h2>
+      <p class="hint">
+        Поддерживается TXT в UTF-8. Правильный ответ отмечайте знаком
+        <strong>+</strong>, неправильные — знаком <strong>−</strong>.
+      </p>
 
-        <div class="question-group">
-            <label class="title">Коморбидности / факторы риска ошибочного диагноза</label>
-            <div class="checkbox-group">
-                <label><input type="checkbox" name="comorbid" value="vascular"> Сосудистые (АГ, СД, курение, дислипидемия)</label>
-                <label><input type="checkbox" name="comorbid" value="migraine"> Головные боли / мигрень</label>
-                <label><input type="checkbox" name="comorbid" value="psychiatric"> Психические расстройства</label>
-                <label><input type="checkbox" name="comorbid" value="autoimmune"> Аутоиммунные заболевания</label>
-                <label><input type="checkbox" name="comorbid_none" id="comorbid_none" checked> Нет</label>
-            </div>
-            <p class="hint">При наличии этих факторов требуются дополнительные подтверждающие признаки (спинальный очаг, CSF+, CVS+).</p>
-        </div>
+      <div class="upload-area">
+        <label for="file-input"><strong>Выберите TXT-файл</strong></label>
+        <input id="file-input" type="file" accept=".txt,text/plain">
+      </div>
 
-        <div class="question-group">
-            <label class="title">Клинический фенотип (тип течения)</label>
-            <div class="options">
-                <label><input type="radio" name="course" value="rr" checked> Ремиттирующий (РРС)</label>
-                <label><input type="radio" name="course" value="sp"> Вторично-прогрессирующий (ВПРС)</label>
-                <label><input type="radio" name="course" value="pp"> Первично-прогрессирующий (ППРС)</label>
-            </div>
-            <p class="hint">Для диагностики ВПРС и РРС используется единый алгоритм; ППРС имеет дополнительные требования.</p>
-        </div>
+      <p id="file-status" class="status" role="status" aria-live="polite">
+        Файл ещё не загружен.
+      </p>
+      <button id="start-button" class="primary-button" disabled>
+        Начать тест
+      </button>
+    </section>
 
-        <div class="question-group" id="pp-group" style="display:none;">
-            <label class="title">Прогрессирование неврологического дефицита ≥ 12 месяцев (независимо от обострений)?</label>
-            <div class="options">
-                <label><input type="radio" name="progression" value="yes"> Да</label>
-                <label><input type="radio" name="progression" value="no" checked> Нет</label>
-            </div>
-            <p class="hint">Обязательно для ППРС (Panel 6, 2024).</p>
-        </div>
+    <section class="card" id="quiz-screen" hidden>
+      <div class="quiz-top">
+        <span id="question-counter"></span>
+        <span id="score-counter"></span>
+      </div>
 
-        <div class="question-group">
-            <label class="title">Клинические атаки (обострения) за весь период наблюдения</label>
-            <div class="options">
-                <label><input type="radio" name="attacks" value="0"> 0 (РИС — случайная находка)</label>
-                <label><input type="radio" name="attacks" value="1"> 1 (КИС)</label>
-                <label><input type="radio" name="attacks" value="2" checked> ≥ 2</label>
-            </div>
-            <p class="hint">≥ 2 атак автоматически подтверждают DIT (клинически).</p>
-        </div>
+      <div
+        class="progress-track"
+        role="progressbar"
+        aria-label="Прогресс теста"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+      >
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
 
-        <div class="question-group" id="dit-mri-group">
-            <label class="title">DIT по МРТ (при &lt; 2 атаках)</label>
-            <div class="checkbox-group vertical">
-                <label><input type="checkbox" name="dit_new_lesions"> Новые или увеличившиеся Т2-очаги на повторной МРТ</label>
-                <label><input type="checkbox" name="dit_enh_nonenh"> Одновременные Gd-усиливающиеся и Gd-неусиливающиеся очаги на одной МРТ</label>
-            </div>
-            <p class="hint">DIT больше не обязателен для диагноза РС в 2024 г., но используется для повышения специфичности в отдельных ситуациях.</p>
-        </div>
-    </div>
+      <h2 class="question" id="question-text"></h2>
+      <div class="answers" id="answers"></div>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
 
-    <!-- ШАГ 2 -->
-    <div id="step2" class="step">
-        <div class="question-group">
-            <label class="title">Типичные очаги в 5 топографических регионах ЦНС</label>
-            <p class="hint">Отметьте регионы, в которых выявлены типичные для РС очаги (симптомные или асимптомные). DIS выполнен при ≥ 2 из 5 регионов; ≥ 4 регионов достаточно для диагноза без доп. критериев.</p>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="region_optic"> Зрительный нерв</label>
-                <label><input type="checkbox" id="region_perivent"> Перивентрикулярно</label>
-                <label><input type="checkbox" id="region_juxta"> Юкстакортикально / интракортикально</label>
-                <label><input type="checkbox" id="region_infratent"> Инфратенториально</label>
-                <label><input type="checkbox" id="region_spinal"> Спинной мозг</label>
-            </div>
-        </div>
+      <div class="quiz-controls">
+        <button id="next-button" class="primary-button" disabled>
+          Следующий вопрос
+        </button>
+        <button id="back-button" class="secondary-button">
+          К загрузке файла
+        </button>
+      </div>
+    </section>
 
-        <div class="question-group">
-            <label class="title">Если отмечен зрительный нерв — как подтверждён?</label>
-            <p class="hint">Достаточно любого из методов при отсутствии лучшего объяснения (Panel 3, 2024).</p>
-            <div class="checkbox-group vertical">
-                <label><input type="checkbox" id="optic_mri"> МРТ: интринсик-очаг(и) зрительного нерва T2-гиперинтенсивный, без признаков оптического периневрита / хиазмального поражения / longitudinally extensive процесса</label>
-                <label><input type="checkbox" id="optic_oct"> ОКТ: межглазная разница pRNFL ≥ 6 мкм ИЛИ GCIPL ≥ 4 мкм</label>
-                <label><input type="checkbox" id="optic_vep"> ЗВП: удлинение абсолютной P100 или межокулярная асимметрия ≥ 2,5 SD (по локальным нормативам центра)</label>
-            </div>
-        </div>
+    <section class="card result" id="result-screen" hidden>
+      <h2>Тест завершён</h2>
+      <p>Ваш результат:</p>
+      <p class="score" id="final-score"></p>
+      <p id="result-message"></p>
+      <div class="quiz-controls" style="justify-content:center">
+        <button id="restart-button" class="primary-button">
+          Пройти ещё раз
+        </button>
+        <button id="new-file-button" class="secondary-button">
+          Загрузить другой файл
+        </button>
+      </div>
+    </section>
+  </main>
 
-        <div class="question-group">
-            <label class="title">Спинной мозг: количество типичных очагов</label>
-            <div class="options">
-                <label><input type="radio" name="spinal_count" value="0" checked> 0</label>
-                <label><input type="radio" name="spinal_count" value="1"> 1</label>
-                <label><input type="radio" name="spinal_count" value="2"> ≥ 2</label>
-            </div>
-            <p class="hint">Для ППРС ≥ 2 спинальных очага сами по себе fulfilment DIS (Panel 4).</p>
-        </div>
+  <script>
+    const fileInput = document.getElementById("file-input");
+    const fileStatus = document.getElementById("file-status");
+    const startButton = document.getElementById("start-button");
 
-        <div class="question-group">
-            <label class="title">Общее число Т2-очагов в белом веществе (для оценки CVS Select 6)</label>
-            <input type="number" id="totalLesions" class="number-input" min="0" max="200" value="0">
-            <p class="hint">Введите 0, если подсчёт не проводился.</p>
-        </div>
+    const uploadScreen = document.getElementById("upload-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const resultScreen = document.getElementById("result-screen");
 
-        <div class="question-group">
-            <label class="title">Число очагов с симптомом «центральной вены» (CVS+)</label>
-            <input type="number" id="cvsCount" class="number-input" min="0" max="200" value="0">
-            <p class="hint">
-                Select 6 положителен, если:<br>
-                • ≥ 6 очагов CVS+ при общем числе очагов ≥ 10, ИЛИ<br>
-                • CVS+ очаги составляют большинство при общем числе очагов &lt; 10.
-            </p>
-        </div>
+    const questionCounter = document.getElementById("question-counter");
+    const scoreCounter = document.getElementById("score-counter");
+    const progressBar = document.getElementById("progress-bar");
+    const progressTrack = document.querySelector(".progress-track");
+    const questionText = document.getElementById("question-text");
+    const answersContainer = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+    const nextButton = document.getElementById("next-button");
 
-        <div class="question-group">
-            <label class="title">Парамагнитные rim-очаги (PRL) ≥ 1?</label>
-            <div class="options">
-                <label><input type="radio" name="prl" value="yes"> Да</label>
-                <label><input type="radio" name="prl" value="no" checked> Нет</label>
-            </div>
-        </div>
-    </div>
+    let loadedQuestions = [];
+    let questions = [];
+    let questionIndex = 0;
+    let score = 0;
+    let answered = false;
 
-    <!-- ШАГ 3 -->
-    <div id="step3" class="step">
-        <div class="question-group">
-            <label class="title">Ликвор (CSF)</label>
-            <div class="checkbox-group vertical">
-                <label><input type="checkbox" name="csf_ocb"> Олигоклональные IgG-полосы, CSF-специфичные (паттерн 2 или 3)</label>
-                <label><input type="checkbox" name="csf_kflc"> Индекс kFLC &gt; 6,1</label>
-            </div>
-            <p class="hint">Положительным считается наличие хотя бы одного из признаков (OCB и kFLC-индекс взаимозаменяемы).</p>
-        </div>
+    // Перемешивание Фишера — Йетса.
+    function shuffle(items) {
+      const result = [...items];
 
-        <div class="question-group">
-            <label class="title">Исключение альтернативных диагнозов</label>
-            <div class="checkbox-group vertical">
-                <label><input type="checkbox" name="exclusion_ok"> Исключены альтернативные диагнозы (NMOSD, MOGAD, сосудистые, инфекционные, опухоли, дефицит B12, лейкодистрофии и др.)</label>
-            </div>
-            <p class="hint">Для диагноза РС необходимо отсутствие лучшего объяснения («no better explanation»).</p>
-        </div>
-    </div>
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
 
-    <!-- ШАГ 4 -->
-    <div id="step4" class="step">
-        <h3 style="margin-top:0;">Результат диагностики</h3>
-        <div id="resultContainer">
-            <p>Нажмите «Диагностировать» для получения заключения.</p>
-            <button onclick="runDiagnosis()" style="background:#1a2b4c; color:white; border:none; padding:12px 30px; border-radius:30px; font-size:18px; cursor:pointer;">Диагностировать</button>
-        </div>
-        <div id="resultBox" class="result-box" style="display:none;"></div>
-    </div>
+      return result;
+    }
 
-    <div class="nav-buttons">
-        <button id="prevBtn" class="secondary" onclick="changeStep(-1)" disabled>Назад</button>
-        <button id="nextBtn" onclick="changeStep(1)">Далее</button>
-    </div>
+    // Формат TXT:
+    // 1. Текст вопроса?
+    // + Правильный вариант
+    // − Неправильный вариант
+    function parseQuestions(text) {
+      const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
+      const parsed = [];
+      let currentQuestion = null;
 
-    <footer>Инструмент основан на критериях Макдональда 2024. Для клинического использования требуется подтверждение врачом.</footer>
-</div>
+      function saveCurrentQuestion() {
+        if (!currentQuestion) return;
 
-<script>
-/* ===================== Навигация по шагам ===================== */
-let currentStep = 1;
-const totalSteps = 4;
+        if (currentQuestion.answers.length < 2) {
+          throw new Error(
+            `Вопрос «${currentQuestion.text}» должен содержать минимум два варианта ответа.`
+          );
+        }
 
-function updateStepUI() {
-    document.querySelectorAll('.step').forEach((el, idx) => {
-        el.classList.toggle('active', idx === currentStep - 1);
-    });
-    document.querySelectorAll('.step-indicator span').forEach((el, idx) => {
-        el.classList.toggle('active', idx === currentStep - 1);
-    });
-    document.getElementById('prevBtn').disabled = (currentStep === 1);
-    document.getElementById('nextBtn').textContent = (currentStep === totalSteps) ? 'Завершить' : 'Далее';
+        const correctAnswers = currentQuestion.answers.filter(
+          answer => answer.correct
+        ).length;
 
-    const course = document.querySelector('input[name="course"]:checked');
-    document.getElementById('pp-group').style.display = (course && course.value === 'pp') ? 'block' : 'none';
+        if (correctAnswers !== 1) {
+          throw new Error(
+            `У вопроса «${currentQuestion.text}» должен быть ровно один правильный ответ, отмеченный знаком +.`
+          );
+        }
 
-    const attacks = document.querySelector('input[name="attacks"]:checked');
-    document.getElementById('dit-mri-group').style.display = (attacks && attacks.value === '2') ? 'none' : 'block';
-}
+        parsed.push(currentQuestion);
+      }
 
-function changeStep(delta) {
-    let newStep = currentStep + delta;
-    if (newStep < 1) newStep = 1;
-    if (newStep > totalSteps) {
-        if (currentStep === totalSteps) runDiagnosis();
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line) continue;
+
+        const questionMatch = line.match(/^\d+[.)]\s*(.+)$/);
+
+        if (questionMatch) {
+          saveCurrentQuestion();
+          currentQuestion = {
+            text: questionMatch[1].trim(),
+            answers: []
+          };
+          continue;
+        }
+
+        const answerMatch = line.match(/^([+−–-])\s*(.+)$/);
+
+        if (answerMatch && currentQuestion) {
+          currentQuestion.answers.push({
+            text: answerMatch[2].trim(),
+            correct: answerMatch[1] === "+"
+          });
+        } else if (currentQuestion) {
+          // Если текст вопроса или варианта случайно перенесён на следующую строку.
+          const lastAnswer =
+            currentQuestion.answers[currentQuestion.answers.length - 1];
+
+          if (lastAnswer) {
+            lastAnswer.text += " " + line;
+          } else {
+            currentQuestion.text += " " + line;
+          }
+        }
+      }
+
+      saveCurrentQuestion();
+
+      if (parsed.length === 0) {
+        throw new Error(
+          "Не удалось найти вопросы. Проверьте формат файла и нумерацию вопросов."
+        );
+      }
+
+      return parsed;
+    }
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      loadedQuestions = [];
+      startButton.disabled = true;
+
+      if (!file) {
+        fileStatus.textContent = "Файл ещё не загружен.";
+        fileStatus.classList.remove("error-message");
         return;
-    }
-    currentStep = newStep;
-    updateStepUI();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+      }
 
-document.querySelectorAll('input[name="course"], input[name="attacks"]').forEach(el => {
-    el.addEventListener('change', updateStepUI);
-});
-
-/* Чекбокс "Нет коморбидностей" — управление остальными */
-const comorbidNone = document.getElementById('comorbid_none');
-const comorbidBoxes = document.querySelectorAll('input[name="comorbid"]');
-comorbidBoxes.forEach(cb => {
-    cb.addEventListener('change', () => {
-        if (cb.checked) comorbidNone.checked = false;
-        if (!Array.from(comorbidBoxes).some(c => c.checked)) comorbidNone.checked = true;
+      try {
+        const text = await file.text();
+        loadedQuestions = parseQuestions(text);
+        fileStatus.textContent =
+          `Загружено вопросов: ${loadedQuestions.length} (${file.name})`;
+        fileStatus.classList.remove("error-message");
+        startButton.disabled = false;
+      } catch (error) {
+        fileStatus.textContent = error.message;
+        fileStatus.classList.add("error-message");
+      }
     });
-});
-comorbidNone.addEventListener('change', () => {
-    if (comorbidNone.checked) comorbidBoxes.forEach(c => c.checked = false);
-});
 
-/* ===================== Утилиты ===================== */
-function getRadio(name) {
-    const el = document.querySelector(`input[name="${name}"]:checked`);
-    return el ? el.value : null;
-}
-function isChecked(id) {
-    const el = document.getElementById(id);
-    return !!(el && el.checked);
-}
-function getComorbidities() {
-    return Array.from(document.querySelectorAll('input[name="comorbid"]:checked'))
-        .map(el => el.value)
-        .filter(v => v !== 'none');
-}
-/* Select 6 (Panel 5, 2024):
-   - при общем числе очагов ≥ 10: CVS+ ≥ 6
-   - при общем числе очагов < 10: CVS+ составляет большинство */
-function calcCVSpositive(cvs, total) {
-    if (total <= 0) return false;
-    if (total >= 10) return cvs >= 6;
-    return cvs > total / 2;
-}
+    startButton.addEventListener("click", startQuiz);
 
-/* ===================== Основная логика ===================== */
-function runDiagnosis() {
-    /* ---- Сбор данных ---- */
-    const age = getRadio('age') || '18-49';
-    const comorbidities = getComorbidities();
-    const hasComorbidities = comorbidities.length > 0;
+    function startQuiz() {
+      if (!loadedQuestions.length) return;
 
-    const course = getRadio('course') || 'rr';
-    const progression = (course === 'pp') ? getRadio('progression') : null;
-    const attacks = getRadio('attacks') || '2';
+      // Копируем вопросы, чтобы повторный запуск не портил исходный список.
+      questions = loadedQuestions.map(question => ({
+        text: question.text,
+        answers: shuffle(question.answers)
+      }));
 
-    const ditNew = document.querySelector('input[name="dit_new_lesions"]').checked;
-    const ditEnh = document.querySelector('input[name="dit_enh_nonenh"]').checked;
-    const ditRad = ditNew || ditEnh;
+      questionIndex = 0;
+      score = 0;
 
-    /* Регионы: зрительный нерв считается положительным, если отмечен хотя бы один метод (МРТ/ОКТ/ЗВП) */
-    const optic = isChecked('region_optic') || isChecked('optic_mri') || isChecked('optic_oct') || isChecked('optic_vep');
-    const perivent = isChecked('region_perivent');
-    const juxta    = isChecked('region_juxta');
-    const infratent= isChecked('region_infratent');
-    const spinalRegion = isChecked('region_spinal');
-    const regionsCount = [optic, perivent, juxta, infratent, spinalRegion].filter(Boolean).length;
+      uploadScreen.hidden = true;
+      resultScreen.hidden = true;
+      quizScreen.hidden = false;
 
-    const spinalCount = getRadio('spinal_count') || '0';
-    const totalLesions = parseInt(document.getElementById('totalLesions').value, 10) || 0;
-    const cvsCount = parseInt(document.getElementById('cvsCount').value, 10) || 0;
-    const prl = getRadio('prl') === 'yes';
+      showQuestion();
+    }
 
-    const csfOCB = document.querySelector('input[name="csf_ocb"]').checked;
-    const csfKflc = document.querySelector('input[name="csf_kflc"]').checked;
-    const csfPositive = csfOCB || csfKflc;
+    function showQuestion() {
+      const question = questions[questionIndex];
+      answered = false;
 
-    const exclusionOk = document.querySelector('input[name="exclusion_ok"]').checked;
+      questionCounter.textContent =
+        `Вопрос ${questionIndex + 1} из ${questions.length}`;
+      scoreCounter.textContent = `Правильных ответов: ${score}`;
 
-    /* ---- Производные значения ---- */
-    const cvsPos = calcCVSpositive(cvsCount, totalLesions);
-    const DIT = (attacks === '2') || ditRad;
+      const progress = (questionIndex / questions.length) * 100;
+      progressBar.style.width = `${progress}%`;
+      progressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
 
-    const disRegions = regionsCount >= 2;
-    const disSpinal  = (course === 'pp' && spinalCount === '2');   // ≥ 2 спинальных очага = DIS при прогрессирующем течении
-    const DIS_met    = disRegions || disSpinal;
-    const DIS_4plus  = regionsCount >= 4;
+      questionText.textContent = question.text;
+      feedback.textContent = "";
+      feedback.className = "feedback";
+      nextButton.disabled = true;
+      nextButton.textContent =
+        questionIndex === questions.length - 1
+          ? "Завершить тест"
+          : "Следующий вопрос";
 
-    /* ---- Алгоритм ---- */
-    const details = [];
-    let diagnosisType = null;   // 'rr' | 'sp' | 'pp'
-    let result = '';
+      answersContainer.replaceChildren();
 
-    if (course === 'pp') {
-        /* ===== Первично-прогрессирующее течение ===== */
-        if (progression !== 'yes') {
-            result = 'НЕДОСТАТОЧНО ДАННЫХ';
-            details.push('Для ППРС необходимо документированное прогрессирование ≥ 12 месяцев, независимое от обострений (Panel 6).');
-        } else if (DIS_4plus) {
-            diagnosisType = 'pp';
-            details.push('ППРС: прогрессирование ≥ 12 мес + ≥ 4 региона с типичными очагами — достаточно для диагноза без дополнительных критериев (Panel 4).');
-        } else if (DIS_met && (csfPositive || cvsPos || DIT)) {
-            diagnosisType = 'pp';
-            const pieces = [];
-            if (disRegions) pieces.push('≥ 2 региона');
-            if (disSpinal)  pieces.push('≥ 2 спинальных очага = DIS');
-            const markers = [];
-            if (csfPositive) markers.push('CSF+');
-            if (cvsPos)      markers.push('CVS+ (Select 6)');
-            if (DIT)         markers.push('DIT');
-            details.push(`ППРС: прогрессирование ≥ 12 мес + DIS (${pieces.join('; ')}) + ${markers.join(' / ')}.`);
-        } else if (regionsCount === 1 && (cvsPos || prl) && (DIT || csfPositive)) {
-            diagnosisType = 'pp';
-            const first = [];
-            if (cvsPos) first.push('CVS+');
-            if (prl)    first.push('PRL+');
-            const second = [];
-            if (DIT)         second.push('DIT');
-            if (csfPositive) second.push('CSF+');
-            details.push(`ППРС: прогрессирование ≥ 12 мес + 1 регион + (${first.join(' / ')}) + (${second.join(' / ')}).`);
-        } else {
-            result = 'НЕДОСТАТОЧНО КРИТЕРИЕВ';
-            details.push('ППРС: прогрессирование есть, но критерии DIS и/или дополнительных маркеров (CSF+, CVS+, DIT) не выполнены.');
+      question.answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer-button";
+        button.textContent = `${String.fromCharCode(65 + index)}. ${answer.text}`;
+        button.addEventListener("click", () => chooseAnswer(button, answer));
+        answersContainer.appendChild(button);
+      });
+    }
+
+    function chooseAnswer(selectedButton, selectedAnswer) {
+      if (answered) return;
+      answered = true;
+
+      const answerButtons = answersContainer.querySelectorAll(".answer-button");
+
+      answerButtons.forEach((button, index) => {
+        const answer = questions[questionIndex].answers[index];
+        button.disabled = true;
+
+        if (answer.correct) {
+          button.classList.add("correct");
         }
-    } else {
-        /* ===== Ремиттирующее или вторично-прогрессирующее ===== */
-        if (attacks === '2') {
-            /* ≥ 2 атак: DIT клинически выполнен */
-            if (DIS_met) {
-                diagnosisType = course;
-                const pieces = [];
-                if (disRegions) pieces.push('≥ 2 региона');
-                if (disSpinal)  pieces.push('≥ 2 спинальных очага');
-                details.push(`≥ 2 атак (DIT клинически) + DIS (${pieces.join('; ')}).`);
-            } else if (regionsCount === 1 && (cvsPos || prl)) {
-                diagnosisType = course;
-                const markers = [];
-                if (cvsPos) markers.push('CVS+');
-                if (prl)    markers.push('PRL+');
-                details.push(`≥ 2 атак (DIT клинически) + 1 регион + ${markers.join(' / ')}.`);
-            } else if (regionsCount === 0) {
-                result = 'РС МАЛОВЕРОЯТЕН';
-                details.push('≥ 2 атак, но ни одного типичного региона на МРТ.');
-            } else {
-                result = 'НАБЛЮДЕНИЕ';
-                details.push('≥ 2 атак, но DIS не выполнен и нет высокоспецифичных маркеров (CVS+ / PRL+) в единственном регионе.');
-            }
-        } else if (attacks === '1') {
-            /* КИС */
-            if (DIS_4plus) {
-                diagnosisType = course;
-                details.push('КИС + ≥ 4 региона с типичными очагами — достаточно для диагноза (Panel 4).');
-            } else if (DIS_met && (csfPositive || cvsPos || DIT)) {
-                diagnosisType = course;
-                const markers = [];
-                if (csfPositive) markers.push('CSF+');
-                if (cvsPos)      markers.push('CVS+ (Select 6)');
-                if (DIT)         markers.push('DIT');
-                details.push(`КИС + DIS (≥ 2 региона) + ${markers.join(' / ')}.`);
-            } else if (regionsCount === 1 && (cvsPos || prl) && (DIT || csfPositive)) {
-                diagnosisType = course;
-                const first = [];
-                if (cvsPos) first.push('CVS+');
-                if (prl)    first.push('PRL+');
-                const second = [];
-                if (DIT)         second.push('DIT');
-                if (csfPositive) second.push('CSF+');
-                details.push(`КИС + 1 регион + (${first.join(' / ')}) + (${second.join(' / ')}).`);
-            } else {
-                result = (regionsCount === 0) ? 'РС МАЛОВЕРОЯТЕН' : 'НАБЛЮДЕНИЕ';
-                details.push('КИС: недостаточно критериев для диагноза РС. Рекомендовано динамическое наблюдение.');
-            }
-        } else {
-            /* РИС (0 атак) */
-            if (DIS_met && (DIT || csfPositive || cvsPos)) {
-                diagnosisType = 'rr';
-                const markers = [];
-                if (DIT)         markers.push('DIT');
-                if (csfPositive) markers.push('CSF+');
-                if (cvsPos)      markers.push('CVS+ (Select 6)');
-                details.push(`РИС + DIS (≥ 2 региона) + ${markers.join(' / ')} (Panel 6).`);
-            } else if (DIS_met) {
-                result = 'НАБЛЮДЕНИЕ (РИС)';
-                details.push('РИС: DIS выполнен, но отсутствуют DIT, CSF+ или CVS+ — требуется наблюдение.');
-            } else {
-                result = 'РС МАЛОВЕРОЯТЕН';
-                details.push('РИС: DIS не выполнен (менее 2 типичных регионов ЦНС).');
-            }
-        }
+      });
+
+      if (selectedAnswer.correct) {
+        score++;
+        feedback.textContent = "Верно!";
+        feedback.classList.add("correct-text");
+      } else {
+        selectedButton.classList.add("incorrect");
+        feedback.textContent = "Неверно. Правильный ответ отмечен зелёным.";
+        feedback.classList.add("incorrect-text");
+      }
+
+      scoreCounter.textContent = `Правильных ответов: ${score}`;
+      nextButton.disabled = false;
     }
 
-    /* ---- Проверка для возраста ≥ 50 лет / коморбидностей (Panel 7) ---- */
-    if (diagnosisType && (age === 'ge50' || hasComorbidities)) {
-        const additionalPresent = (spinalCount !== '0') || csfPositive || cvsPos;
-        if (!additionalPresent) {
-            details.push('⚠️ Пациент ≥ 50 лет и/или имеет коморбидности. Рекомендуется дополнительный подтверждающий признак (спинальный очаг, CSF+ или CVS+), который отсутствует. Диагноз не может быть уверенно подтверждён.');
-            diagnosisType = null;
-            result = 'НАБЛЮДЕНИЕ';
-        } else {
-            const addFeatures = [];
-            if (spinalCount !== '0') addFeatures.push('спинальный очаг');
-            if (csfPositive)         addFeatures.push('CSF+');
-            if (cvsPos)              addFeatures.push('CVS+');
-            details.push(`✓ Учтён дополнительный подтверждающий признак для возраста ≥ 50 / коморбидностей: ${addFeatures.join(', ')} (Panel 7).`);
-        }
+    nextButton.addEventListener("click", () => {
+      if (!answered) return;
+
+      questionIndex++;
+
+      if (questionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      quizScreen.hidden = true;
+      resultScreen.hidden = false;
+
+      const percentage = Math.round((score / questions.length) * 100);
+      document.getElementById("final-score").textContent =
+        `${score} из ${questions.length} — ${percentage}%`;
+
+      let message = "Хорошая работа!";
+      if (percentage === 100) {
+        message = "Отличный результат — все ответы правильные!";
+      } else if (percentage < 50) {
+        message = "Можно повторить материал и пройти тест ещё раз.";
+      }
+
+      document.getElementById("result-message").textContent = message;
     }
 
-    /* ---- Исключение альтернативных диагнозов ---- */
-    if (!exclusionOk) {
-        details.unshift('⚠️ ВНИМАНИЕ: Альтернативные диагнозы не исключены. Диагноз РС может быть установлен только после исключения NMOSD, MOGAD, сосудистых, инфекционных, опухолевых и других заболеваний («no better explanation»).');
-    }
+    document.getElementById("back-button").addEventListener("click", () => {
+      quizScreen.hidden = true;
+      resultScreen.hidden = true;
+      uploadScreen.hidden = false;
+    });
 
-    /* ---- Формирование финального результата ---- */
-    let finalDiagnosis = null;
-    if (diagnosisType) {
-        const typeName = {
-            'rr': 'ремиттирующий тип течения',
-            'sp': 'вторично-прогрессирующий тип течения',
-            'pp': 'первично-прогрессирующий тип течения'
-        }[diagnosisType];
-        finalDiagnosis = 'Рассеянный склероз, ' + typeName;
-    } else if (!result) {
-        result = 'НАБЛЮДЕНИЕ';
-        details.push('Критерии диагноза РС не выполнены. Рекомендовано динамическое наблюдение.');
-    }
+    document.getElementById("restart-button").addEventListener("click", startQuiz);
 
-    /* ---- Вывод ---- */
-    const box = document.getElementById('resultBox');
-    box.style.display = 'block';
-    let html = '';
-    if (finalDiagnosis) {
-        html += '<span class="diagnosis yes">✅ ' + finalDiagnosis + '</span>';
-    } else if (result.includes('НАБЛЮДЕНИЕ')) {
-        html += '<span class="diagnosis observation">⏳ ' + result + '</span>';
-    } else if (result.includes('НЕДОСТАТОЧНО')) {
-        html += '<span class="diagnosis observation">⚠️ ' + result + '</span>';
-    } else {
-        html += '<span class="diagnosis no">❌ ' + result + '</span>';
-    }
-
-    html += '<div class="details">';
-    details.forEach(d => { html += '<p>• ' + d + '</p>'; });
-    html += '</div>';
-
-    /* ---- Сводка ---- */
-    const regionList = [
-        optic && 'зрит.нерв',
-        perivent && 'перивентр.',
-        juxta && 'юкстакорт.',
-        infratent && 'инфратентор.',
-        spinalRegion && 'спинной мозг'
-    ].filter(Boolean).join(', ') || '—';
-
-    html += '<div class="summary"><strong>Сводка:</strong><br>';
-    html += 'Регионов затронуто: <b>' + regionsCount + ' из 5</b> (' + regionList + ')<br>';
-    html += 'DIS: ' + (DIS_met ? 'выполнен' : 'не выполнен') +
-            ' | DIS (≥ 4 регионов): ' + (DIS_4plus ? 'да' : 'нет') +
-            ' | DIT: ' + (DIT ? 'да' : 'нет') +
-            ' | CSF+: ' + (csfPositive ? 'да' : 'нет') + '<br>';
-    html += 'CVS+ (Select 6): ' + (cvsPos ? 'да' : 'нет') +
-            ' (CVS+ ' + cvsCount + ' из ' + totalLesions + ' очагов)' +
-            ' | PRL+: ' + (prl ? 'да' : 'нет') +
-            ' | Спинальных очагов: ' + spinalCount + '<br>';
-    html += 'Возраст: ' + age +
-            ' | Коморбидности: ' + (hasComorbidities ? comorbidities.join(', ') : 'нет') +
-            ' | Атак: ' + attacks +
-            ' | Фенотип: ' + course.toUpperCase() +
-            ' | Исключение альтернатив: ' + (exclusionOk ? 'да' : 'НЕТ');
-    html += '</div>';
-
-    box.innerHTML = html;
-    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-document.addEventListener('DOMContentLoaded', updateStepUI);
-</script>
+    document.getElementById("new-file-button").addEventListener("click", () => {
+      resultScreen.hidden = true;
+      uploadScreen.hidden = false;
+    });
+  </script>
 </body>
 </html>
